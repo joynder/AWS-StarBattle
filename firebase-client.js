@@ -11,7 +11,7 @@ if (!config?.apiKey || !config?.projectId) {
   window.awsStore = localStore;
   window.dispatchEvent(new Event('aws-store-ready'));
 } else {
-  const [{ initializeApp }, { getAuth, GoogleAuthProvider, signInWithPopup }, { getFirestore, doc, getDoc, setDoc }] = await Promise.all([
+  const [{ initializeApp }, { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult }, { getFirestore, doc, getDoc, setDoc }] = await Promise.all([
     import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'),
     import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js'),
     import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js'),
@@ -21,6 +21,18 @@ if (!config?.apiKey || !config?.projectId) {
   const db = getFirestore(app);
   const rankingDoc = doc(db, 'awsStarBattle', 'ranking');
   const isAdmin = (user) => !!user && config.allowedAdmins.includes(user.email?.toLowerCase());
+  const provider = new GoogleAuthProvider();
+  let redirectLoginResult = null;
+
+  try {
+    const result = await getRedirectResult(auth);
+    if (result && sessionStorage.getItem('awsAdminLoginRedirect') === '1') {
+      redirectLoginResult = isAdmin(result.user);
+      sessionStorage.removeItem('awsAdminLoginRedirect');
+    }
+  } catch {
+    sessionStorage.removeItem('awsAdminLoginRedirect');
+  }
 
   window.awsStore = {
     async load() {
@@ -32,8 +44,26 @@ if (!config?.apiKey || !config?.projectId) {
       await setDoc(rankingDoc, data);
     },
     async login() {
-      const result = await signInWithPopup(auth, new GoogleAuthProvider());
-      return isAdmin(result.user);
+      if (window.matchMedia('(pointer: coarse)').matches) {
+        sessionStorage.setItem('awsAdminLoginRedirect', '1');
+        await signInWithRedirect(auth, provider);
+        return { redirecting: true };
+      }
+      try {
+        const result = await signInWithPopup(auth, provider);
+        return isAdmin(result.user);
+      } catch (error) {
+        const redirectErrors = ['auth/popup-blocked', 'auth/operation-not-supported-in-this-environment'];
+        if (!redirectErrors.includes(error?.code)) throw error;
+        sessionStorage.setItem('awsAdminLoginRedirect', '1');
+        await signInWithRedirect(auth, provider);
+        return { redirecting: true };
+      }
+    },
+    consumeRedirectLogin() {
+      const result = redirectLoginResult;
+      redirectLoginResult = null;
+      return result;
     },
   };
   window.dispatchEvent(new Event('aws-store-ready'));
