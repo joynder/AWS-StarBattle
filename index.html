@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#10051d" />
+  <title>AWS Star Battle | Classifica Squadre</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <style>.admin-only{display:none!important}.admin .add-btn.admin-only{display:inline-flex!important}.admin th.admin-only,.admin td.admin-only{display:table-cell!important}.sponsors{padding:65px 28px 70px;text-align:center;border-top:1px solid rgba(196,144,255,.24);background:linear-gradient(90deg,rgba(93,25,159,.08),transparent,rgba(93,25,159,.08))}.sponsors h2{font:700 clamp(25px,3vw,38px) Orbitron,sans-serif;margin:0 0 30px;letter-spacing:-1px}.sponsor-grid{width:min(1000px,100%);margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.sponsor-card{height:128px;display:flex;align-items:center;justify-content:center;padding:16px;background:#100d15;border:1px solid rgba(196,144,255,.2);overflow:hidden}.sponsor-card img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 8px rgba(187,102,255,.12))}.sponsor-light{background:#f6f3f7}.sponsor-light img{mix-blend-mode:multiply}@media(max-width:700px){.sponsor-grid{grid-template-columns:repeat(2,1fr)}.sponsor-card{height:105px;padding:12px}}</style>
+</head>
+<body>
+  <style>footer{min-height:130px!important;padding:25px clamp(20px,5vw,82px)!important;display:flex!important;align-items:center!important;justify-content:space-between!important;text-align:left!important;gap:25px}.footer-brand{display:grid;grid-template-columns:50px auto;column-gap:10px;align-items:center}.footer-brand>img{width:48px!important;height:48px!important;grid-row:1/3;margin:0!important}.footer-brand span{font:600 12px Orbitron,sans-serif!important;color:#d5a9ff;letter-spacing:1px}.footer-brand p{grid-column:2;margin:4px 0 0!important;font-size:13px!important}.footer-sponsors{display:flex;align-items:center;justify-content:flex-end;gap:13px}.footer-sponsors small{font:600 8px Orbitron,sans-serif;letter-spacing:1.2px;color:#8d7e96;margin-right:2px}.footer-sponsors img{width:40px!important;height:32px!important;object-fit:contain;margin:0!important;background:none!important;border-radius:0!important;vertical-align:middle}.footer-sponsors img:nth-of-type(2){background:#f7f4fa!important}.footer-sponsors img:nth-of-type(3){width:51px!important}.footer-sponsors img:nth-of-type(4){width:37px!important}@media(max-width:700px){footer{flex-direction:column;text-align:center!important;padding:27px 18px 22px!important}.footer-brand{justify-items:center}.footer-brand p{grid-column:1/-1}.footer-sponsors{width:100%;justify-content:center;margin-top:8px}.footer-sponsors img{width:34px!important;height:28px!important}.footer-sponsors img:nth-of-type(3){width:43px!important}}</style>
+  <div class="page-glow glow-one"></div><div class="page-glow glow-two"></div>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="AWS Star Battle, torna alla home"><img src="logo-aws.png" alt="Logo AWS Star Battle"><span>AWS <b>STAR BATTLE</b></span></a>
+    <div class="top-actions"><span class="status"><i></i> LIVE RANKING</span><button class="admin-toggle" id="adminToggle">Area riservata</button></div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <p class="eyebrow">BEYBLADE X · TEAM TOURNAMENT</p>
+      <h1>Combatti. Conquista.<br><em>Brilla.</em></h1>
+      <p class="hero-copy">La classifica ufficiale delle squadre AWS. Ogni torneo è una nuova occasione per conquistare le stelle.</p>
+      <a class="scroll-link" href="#tournaments">Scopri i prossimi tornei <span>↓</span></a>
+      <div class="hero-mark">X</div>
+    </section>
+
+    <section class="section tournaments" id="tournaments">
+      <div class="section-heading"><div><p class="eyebrow">CALENDARIO EVENTI</p><h2>Prossimi tornei</h2></div><button class="add-btn admin-only" data-modal="tournament">+ Nuovo torneo</button></div>
+      <div class="tournament-grid" id="tournamentGrid"></div>
+    </section>
+
+    <section class="section ranking" id="ranking">
+      <div class="section-heading"><div><p class="eyebrow">HALL OF FAME</p><h2>Classifica squadre</h2></div><button class="add-btn admin-only" data-modal="team">+ Nuova squadra</button></div>
+      <div class="ranking-wrap"><table><thead><tr><th class="rank-col">#</th><th>Squadra</th><th>Stelle ottenute</th><th class="admin-only manage-col">Gestisci</th></tr></thead><tbody id="rankingBody"></tbody></table></div>
+    </section>
+  </main>
+
+  <footer><div class="footer-brand"><img src="logo-aws.png" alt=""><span>AWS STAR BATTLE</span><p>La leggenda si costruisce una stella alla volta.</p></div><div class="footer-sponsors" aria-label="Sponsor"><small>SPONSOR</small><img src="sponsor-logo-bianco.png" alt="Logo sponsor"><img src="sponsor-res.png" alt="Logo RES"><img src="sponsor-skyrea.png" alt="Logo Skyrea Card Game"><img src="sponsor-bloodbrothers.png" alt="Logo Blood Brothers"></div></footer>
+
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="close" id="closeModal" aria-label="Chiudi">×</button><p class="eyebrow">AREA RISERVATA</p><h3 id="modalTitle">Titolo</h3><form id="editorForm"></form></section></div>
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+  <script type="module" src="firebase-client.js"></script>
+</body>
+</html>
