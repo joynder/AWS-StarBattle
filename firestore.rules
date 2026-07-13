@@ -4,8 +4,7 @@ service cloud.firestore {
     match /awsStarBattle/ranking {
       allow read: if true;
       allow write: if request.auth != null && request.auth.token.email in [
-        // Inserisci qui le stesse email di firebase-config.js, ad esempio:
-        // 'tuoaccount@gmail.com'
+        'joynderland@gmail.com'
       ];
     }
   }

@@ -20,7 +20,8 @@ if (!config?.apiKey || !config?.projectId) {
   const auth = getAuth(app);
   const db = getFirestore(app);
   const rankingDoc = doc(db, 'awsStarBattle', 'ranking');
-  const isAdmin = (user) => !!user && config.allowedAdmins.includes(user.email?.toLowerCase());
+  const allowedAdmins = (config.allowedAdmins || []).map((email) => email.toLowerCase());
+  const isAdmin = (user) => !!user && allowedAdmins.includes(user.email?.toLowerCase());
   const provider = new GoogleAuthProvider();
   let redirectLoginResult = null;
 
@@ -30,8 +31,9 @@ if (!config?.apiKey || !config?.projectId) {
       redirectLoginResult = isAdmin(result.user);
       sessionStorage.removeItem('awsAdminLoginRedirect');
     }
-  } catch {
+  } catch (error) {
     sessionStorage.removeItem('awsAdminLoginRedirect');
+    redirectLoginResult = { error: error?.code || 'auth/redirect-failed' };
   }
 
   window.awsStore = {
@@ -64,6 +66,14 @@ if (!config?.apiKey || !config?.projectId) {
       const result = redirectLoginResult;
       redirectLoginResult = null;
       return result;
+    },
+    loginErrorMessage(error) {
+      const messages = {
+        'auth/unauthorized-domain': `Questo sito (${window.location.hostname}) non è ancora autorizzato in Firebase.`,
+        'auth/popup-closed-by-user': 'La finestra di accesso è stata chiusa prima del completamento.',
+        'auth/network-request-failed': 'Connessione non disponibile. Controlla la rete e riprova.',
+      };
+      return messages[error?.code] || 'Accesso non completato. Riprova.';
     },
   };
   window.dispatchEvent(new Event('aws-store-ready'));

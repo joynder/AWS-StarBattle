@@ -104,8 +104,8 @@ async function finishLogin() {
     $('#loginBackdrop').classList.remove('open');
     render();
     toast('Benvenuto nell’area riservata.');
-  } catch {
-    toast('Accesso non completato. Riprova.');
+  } catch (error) {
+    toast(window.awsStore?.loginErrorMessage?.(error) || 'Accesso non completato. Riprova.');
   }
 }
 
@@ -142,6 +142,8 @@ window.addEventListener('aws-store-ready', async () => {
       toast('Benvenuto nell’area riservata.');
     } else if (redirectLogin === false) {
       toast('Questo account Google non è autorizzato.');
+    } else if (redirectLogin?.error) {
+      toast(window.awsStore.loginErrorMessage?.({ code: redirectLogin.error }) || 'Accesso non completato. Riprova.');
     }
     render();
   } catch { render(); }
