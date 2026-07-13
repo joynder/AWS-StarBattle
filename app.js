@@ -1,15 +1,6 @@
 const defaults = {
-  teams: [
-    { id: 1, name: 'Black Wolves', stars: 38, logo: 'https://placehold.co/90x90/17111f/bd70ff?text=BW' },
-    { id: 2, name: 'Phoenix Bladers', stars: 31, logo: 'https://placehold.co/90x90/3b1527/ff9aca?text=PB' },
-    { id: 3, name: 'Nova Strike', stars: 26, logo: 'https://placehold.co/90x90/112440/8ec3ff?text=NS' },
-    { id: 4, name: 'Iron Ronin', stars: 18, logo: 'https://placehold.co/90x90/382515/ffd287?text=IR' }
-  ],
-  tournaments: [
-    { id: 1, title: 'AWS Night Clash', date: '18 Luglio 2026', time: '15:30', place: 'Milano · X Arena', max: '12 squadre', cost: '€ 10 / player', format: '3vs3 Team Battle' },
-    { id: 2, title: 'Purple Storm Cup', date: '2 Agosto 2026', time: '10:00', place: 'Bologna · Blade Hub', max: '16 squadre', cost: '€ 15 / player', format: '5vs5 Team Battle' },
-    { id: 3, title: 'Rising Stars', date: '23 Agosto 2026', time: '14:00', place: 'Roma · Spin Zone', max: '8 squadre', cost: '€ 8 / player', format: 'Rookie Team Battle' }
-  ]
+  teams: [],
+  tournaments: []
 };
 
 let data = JSON.parse(JSON.stringify(defaults));
@@ -26,6 +17,36 @@ function toast(message) {
   element.textContent = message;
   element.classList.add('show');
   setTimeout(() => element.classList.remove('show'), 2500);
+}
+
+function tournamentTimestamp({ date, time = '00:00' }) {
+  const timeValue = /^\d{2}:\d{2}$/.test(time) ? time : '00:00';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return new Date(`${date}T${timeValue}`).getTime();
+
+  const months = { gennaio: 0, febbraio: 1, marzo: 2, aprile: 3, maggio: 4, giugno: 5, luglio: 6, agosto: 7, settembre: 8, ottobre: 9, novembre: 10, dicembre: 11 };
+  const match = String(date).trim().toLowerCase().match(/^(\d{1,2})\s+([a-zà]+)\s+(\d{4})$/i);
+  if (match && months[match[2]] !== undefined) {
+    const [, day, month, year] = match;
+    return new Date(Number(year), months[month], Number(day), ...timeValue.split(':').map(Number)).getTime();
+  }
+
+  const timestamp = new Date(date).getTime();
+  return Number.isNaN(timestamp) ? Number.POSITIVE_INFINITY : timestamp;
+}
+
+function formatTournamentDate(date) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+  const [year, month, day] = date.split('-').map(Number);
+  return new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+function removeDemoContent(saved) {
+  const demoTeamNames = ['Black Wolves', 'Phoenix Bladers', 'Nova Strike', 'Iron Ronin'];
+  const demoTournamentTitles = ['AWS Night Clash', 'Purple Storm Cup', 'Rising Stars'];
+  return {
+    teams: (Array.isArray(saved?.teams) ? saved.teams : []).filter((team) => !demoTeamNames.includes(team.name)),
+    tournaments: (Array.isArray(saved?.tournaments) ? saved.tournaments : []).filter((tournament) => !demoTournamentTitles.includes(tournament.title))
+  };
 }
 
 async function persist() {
@@ -45,32 +66,34 @@ function render() {
       <td><div class="team-cell"><img class="team-logo" src="${esc(team.logo)}" alt="Logo ${esc(team.name)}" onerror="this.src='https://placehold.co/90x90/41156d/fff?text=★'"><span>${esc(team.name)}</span></div></td>
       <td class="stars">${team.stars}</td>
       <td class="admin-only"><div class="table-actions"><button class="action" onclick="openEdit('team',${team.id})">Modifica</button><button class="action delete" onclick="removeItem('team',${team.id})">Elimina</button></div></td>
-    </tr>`).join('') : '<tr><td colspan="4" class="empty">Nessuna squadra in classifica.</td></tr>';
+    </tr>`).join('') : '';
 
-  $('#tournamentGrid').innerHTML = data.tournaments.length ? data.tournaments.map((tournament) => `
+  const tournaments = [...data.tournaments].sort((first, second) => tournamentTimestamp(first) - tournamentTimestamp(second));
+  $('#tournamentGrid').innerHTML = tournaments.length ? tournaments.map((tournament) => `
     <article class="tournament-card">
       <div class="card-actions"><button class="action" onclick="openEdit('tournament',${tournament.id})">Modifica</button><button class="action delete" onclick="removeItem('tournament',${tournament.id})">Elimina</button></div>
+      ${tournament.image ? `<div class="tournament-image"><img src="${esc(tournament.image)}" alt="Immagine del torneo ${esc(tournament.title)}" loading="lazy" onerror="this.parentElement.remove()"></div>` : ''}
       <p class="eyebrow">TORNEO AWS</p><h3>${esc(tournament.title)}</h3>
       <div class="meta">
-        <div><small>DATA · ORA</small><span>${esc(tournament.date)} · ${esc(tournament.time)}</span></div>
+        <div><small>DATA · ORA</small><span>${esc(formatTournamentDate(tournament.date))} · ${esc(tournament.time)}</span></div>
         <div><small>LUOGO</small><span>${esc(tournament.place)}</span></div>
         <div><small>PARTECIPANTI</small><span>${esc(tournament.max)}</span></div>
         <div><small>COSTO</small><span>${esc(tournament.cost)}</span></div>
         <div><small>FORMATO</small><span>${esc(tournament.format)}</span></div>
       </div>
-    </article>`).join('') : '<div class="empty">Non ci sono tornei programmati.</div>';
+    </article>`).join('') : '';
   document.body.classList.toggle('admin', admin);
 }
 
 const fields = {
   team: [['name', 'Nome squadra', 'text'], ['logo', 'URL logo squadra', 'url'], ['stars', 'Numero stelle', 'number']],
-  tournament: [['title', 'Nome torneo', 'text'], ['date', 'Data', 'text'], ['time', 'Ora', 'time'], ['place', 'Luogo', 'text'], ['max', 'Numero massimo partecipanti', 'text'], ['cost', 'Costo', 'text'], ['format', 'Formato', 'text']]
+  tournament: [['title', 'Nome torneo', 'text'], ['date', 'Data', 'date'], ['time', 'Ora', 'time'], ['place', 'Luogo', 'text'], ['max', 'Numero massimo partecipanti', 'text'], ['cost', 'Costo', 'text'], ['format', 'Formato', 'text'], ['image', 'URL immagine torneo (facoltativo)', 'url', false]]
 };
 
 function openModal(type, item) {
   edit = { type, item };
   $('#modalTitle').textContent = item ? `Modifica ${type === 'team' ? 'squadra' : 'torneo'}` : `Crea ${type === 'team' ? 'una squadra' : 'un torneo'}`;
-  $('#editorForm').innerHTML = `<div class="${type === 'tournament' ? 'form-grid' : ''}">${fields[type].map(([key, label, inputType]) => `<label>${label}<input required name="${key}" type="${inputType}" value="${esc(item?.[key] ?? (key === 'logo' ? 'https://placehold.co/90x90/41156d/fff?text=★' : ''))}"></label>`).join('')}</div><button class="form-save">${item ? 'Salva modifiche' : 'Aggiungi'}</button>`;
+  $('#editorForm').innerHTML = `<div class="${type === 'tournament' ? 'form-grid' : ''}">${fields[type].map(([key, label, inputType, required = true]) => `<label>${label}<input ${required ? 'required' : ''} name="${key}" type="${inputType}" value="${esc(item?.[key] ?? (key === 'logo' ? 'https://placehold.co/90x90/41156d/fff?text=★' : ''))}"></label>`).join('')}</div><button class="form-save">${item ? 'Salva modifiche' : 'Aggiungi'}</button>`;
   $('#modalBackdrop').classList.add('open');
 }
 
@@ -135,7 +158,7 @@ $('#editorForm').addEventListener('submit', (event) => {
 window.addEventListener('aws-store-ready', async () => {
   try {
     const saved = await window.awsStore.load();
-    data = (saved.teams?.length || saved.tournaments?.length) ? saved : JSON.parse(JSON.stringify(defaults));
+    data = removeDemoContent(saved);
     const redirectLogin = window.awsStore.consumeRedirectLogin?.();
     if (redirectLogin === true) {
       admin = true;
