@@ -8,4 +8,7 @@ window.AWS_FIREBASE_CONFIG = {
   storageBucket: 'aws-starbattle.firebasestorage.app',
   messagingSenderId: '575054884350',
   appId: '1:575054884350:web:7539d6bd7f6fc406dbe4af',
+  allowedAdmins: [
+    'joynderland@gmail.com',
+  ],
 };

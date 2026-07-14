@@ -1,7 +1,11 @@
-# Password area riservata su GitHub Pages
+# Accesso amministratore su GitHub Pages
 
-L'area riservata usa la password configurata nel sito (`starbattle`) e non richiede più l'accesso Google.
+Prima della pubblicazione, autorizza il dominio che ospita il sito:
 
-Firebase continua a conservare tornei, squadre, regole e sponsor, così le modifiche rimangono visibili a tutti. Prima della pubblicazione apri la console Firebase del progetto `aws-starbattle`, vai in **Firestore Database** > **Rules**, copia il contenuto di `firestore.rules` e pubblicalo.
+1. Apri la console Firebase del progetto `aws-starbattle`.
+2. Vai in **Authentication** > **Settings** > **Authorized domains**.
+3. Aggiungi il dominio GitHub Pages, nel formato `nome-account.github.io` (senza `https://` e senza il nome della repository). Aggiungi anche l'eventuale dominio personalizzato.
+4. In **Authentication** > **Sign-in method**, verifica che il provider **Google** sia abilitato.
+5. Vai in **Firestore Database** > **Rules**, incolla il contenuto di `firestore.rules` e pubblicalo.
 
-Le nuove regole permettono scritture senza autenticazione Firebase. La password protegge l'interfaccia del sito, ma non impedisce a chi conosce il progetto Firebase di provare a modificare direttamente il database.
+Firebase deve conoscere il dominio di GitHub Pages: questa autorizzazione non può essere inclusa nel codice del sito, perché è una protezione gestita dal progetto Firebase. Una volta aggiunto il dominio, l'accesso con l'account presente in `allowedAdmins` funziona sia in locale sia sul sito pubblicato.
