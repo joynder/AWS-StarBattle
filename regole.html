@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#10051d" />
+  <title>Aprilia WestSide Star Battle | Regole</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20260714-1" />
+  <style>
+    body{background:#08070b!important;background-image:none!important}.topbar{border-bottom-color:rgba(0,225,255,.3)!important;background:rgba(2,4,7,.84)!important}.brand b,.eyebrow{color:#a967ff!important}.status i{background:#00ddf7!important;box-shadow:0 0 13px #00ddf7!important}.admin-toggle{border-color:#00bcd4!important;color:#9ff8ff!important}.admin-toggle:hover,.admin-toggle.active{background:#007f9c!important}.rules-page{max-width:930px;margin:auto;padding:72px 28px 90px}.rules-heading{display:flex;justify-content:space-between;align-items:end;gap:25px;margin-bottom:30px}.rules-heading h1{font:700 clamp(31px,5vw,52px) Orbitron,sans-serif;letter-spacing:-2px;margin:0}.rules-card{background:linear-gradient(145deg,rgba(10,16,24,.9),rgba(11,6,19,.88));border:1px solid rgba(0,222,255,.22);padding:clamp(25px,5vw,58px);box-shadow:0 0 40px rgba(0,227,248,.08)}.rules-content{color:#e5eaf0;font-size:17px;line-height:1.7}.rules-content h1{font:700 clamp(23px,3vw,32px) Orbitron,sans-serif;margin:52px 0 14px;color:#f3f6ff}.rules-content h1:first-child{margin-top:0}.rules-content h2{font:700 21px Orbitron,sans-serif;margin:35px 0 10px;color:#ab55ff}.rules-content h3{font:600 16px Orbitron,sans-serif;margin:0 0 21px;color:#b8c3cb}.rules-content p{margin:0 0 17px}.rules-content ul{margin:0 0 20px;padding-left:24px}.rules-content li{padding-left:3px;margin:4px 0}.rules-content hr{border:0;border-top:1px solid rgba(0,222,255,.22);margin:33px 0}.rules-editor{width:100%;min-height:560px;resize:vertical;line-height:1.55}.rules-help{color:#b8c3cb;font-size:13px;margin:0 0 14px}.rules-actions{display:flex;justify-content:flex-end;gap:10px;margin-bottom:22px}.rules-actions .add-btn{display:none}.admin .rules-actions .add-btn{display:inline-flex}.add-btn,.form-save{background:linear-gradient(100deg,#7b35e7,#05b9d3)!important}.modal{border-color:#00d7ef!important;background:linear-gradient(140deg,#0a0f17,#171025)!important}.login-copy{color:#b8c3cb;line-height:1.45;margin:-12px 0 18px}@media(max-width:760px){.rules-page{padding:48px 18px 65px}.rules-heading{align-items:center}.rules-heading h1{font-size:31px}.rules-card{padding:25px 20px}.rules-content{font-size:16px}.rules-actions{justify-content:stretch}.rules-actions .add-btn{flex:1;justify-content:center}.top-actions{gap:8px}}
+  </style>
+</head>
+<body>
+  <div class="page-glow glow-one"></div><div class="page-glow glow-two"></div>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Aprilia WestSide Star Battle, torna alla home"><img src="logo-aws.png" alt="Logo Aprilia WestSide Star Battle"><span>AWS <b>STAR BATTLE</b></span></a>
+    <div class="top-actions"><span class="status"><i></i> LIVE RANKING</span><a class="admin-toggle rules-link active" href="regole.html">Regole</a><button class="admin-toggle" id="adminToggle">Area riservata</button></div>
+  </header>
+
+  <main class="rules-page">
+    <div class="rules-heading"><div><p class="eyebrow">APRILIA WESTSIDE STAR BATTLE</p><h1>Regole</h1></div></div>
+    <div class="rules-actions"><button class="add-btn" id="editRules">Modifica regole</button></div>
+    <article class="rules-card"><div class="rules-content" id="rulesContent"></div></article>
+  </main>
+
+  <div class="modal-backdrop" id="rulesBackdrop" aria-hidden="true"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="rulesEditorTitle"><button class="close" id="closeRules" aria-label="Chiudi">×</button><p class="eyebrow">AREA RISERVATA</p><h3 id="rulesEditorTitle">Modifica regole</h3><p class="rules-help">Usa titoli con #, elenchi con * e **testo in grassetto**.</p><form id="rulesForm"><textarea class="rules-editor" id="rulesInput" required></textarea><button class="form-save">Salva regole</button></form></section></div>
+  <div class="modal-backdrop" id="loginBackdrop" aria-hidden="true"><section class="modal login-modal" role="dialog" aria-modal="true" aria-labelledby="loginTitle"><button class="close" id="closeLogin" aria-label="Chiudi">×</button><p class="eyebrow">ACCESSO AMMINISTRATORE</p><h3 id="loginTitle">Area riservata</h3><p class="login-copy">Inserisci la password per modificare il regolamento.</p><form id="loginForm" action="javascript:void(0)"><label>Password<input id="adminPassword" type="password" autocomplete="current-password" required placeholder="La tua password"></label><button class="form-save" id="loginSubmit" type="button">Accedi</button></form></section></div>
+  <div class="toast" id="toast"></div>
+  <script src="rules-content.js"></script>
+  <script src="rules.js"></script>
+  <script type="module" src="firebase-client.js"></script>
+</body>
+</html>
