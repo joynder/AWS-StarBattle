@@ -1,6 +1,7 @@
 const defaults = {
   teams: [],
-  tournaments: []
+  tournaments: [],
+  rules: ''
 };
 
 let data = JSON.parse(JSON.stringify(defaults));
@@ -40,12 +41,20 @@ function formatTournamentDate(date) {
   return new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(Date.UTC(year, month - 1, day)));
 }
 
+function isPastTournament({ date }) {
+  const tournamentDay = tournamentTimestamp({ date, time: '00:00' });
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Number.isFinite(tournamentDay) && tournamentDay < today.getTime();
+}
+
 function removeDemoContent(saved) {
   const demoTeamNames = ['Black Wolves', 'Phoenix Bladers', 'Nova Strike', 'Iron Ronin'];
   const demoTournamentTitles = ['AWS Night Clash', 'Purple Storm Cup', 'Rising Stars'];
   return {
     teams: (Array.isArray(saved?.teams) ? saved.teams : []).filter((team) => !demoTeamNames.includes(team.name)),
-    tournaments: (Array.isArray(saved?.tournaments) ? saved.tournaments : []).filter((tournament) => !demoTournamentTitles.includes(tournament.title))
+    tournaments: (Array.isArray(saved?.tournaments) ? saved.tournaments : []).filter((tournament) => !demoTournamentTitles.includes(tournament.title)),
+    rules: typeof saved?.rules === 'string' ? saved.rules : ''
   };
 }
 
@@ -69,9 +78,11 @@ function render() {
     </tr>`).join('') : '';
 
   const tournaments = [...data.tournaments].sort((first, second) => tournamentTimestamp(first) - tournamentTimestamp(second));
-  $('#tournamentGrid').innerHTML = tournaments.length ? tournaments.map((tournament) => `
-    <article class="tournament-card">
-      <div class="card-actions"><button class="action" onclick="openEdit('tournament',${tournament.id})">Modifica</button><button class="action delete" onclick="removeItem('tournament',${tournament.id})">Elimina</button></div>
+  $('#tournamentGrid').innerHTML = tournaments.length ? tournaments.map((tournament) => {
+    const past = isPastTournament(tournament);
+    return `
+    <article class="tournament-card${past ? ' is-past' : ''}" role="link" tabindex="0" onclick='openTournament(${JSON.stringify(tournament.id)})' onkeydown='if(event.key === "Enter" || event.key === " "){event.preventDefault();openTournament(${JSON.stringify(tournament.id)})}'>
+      <div class="card-actions" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()"><button class="action" onclick="openEdit('tournament',${tournament.id})">Modifica</button><button class="action delete" onclick="removeItem('tournament',${tournament.id})">Elimina</button></div>
       ${tournament.image ? `<div class="tournament-image"><img src="${esc(tournament.image)}" alt="Immagine del torneo ${esc(tournament.title)}" loading="lazy" onerror="this.parentElement.remove()"></div>` : ''}
       <p class="eyebrow">TORNEO AWS</p><h3>${esc(tournament.title)}</h3>
       <div class="meta">
@@ -81,7 +92,9 @@ function render() {
         <div><small>COSTO</small><span>${esc(tournament.cost)}</span></div>
         <div><small>FORMATO</small><span>${esc(tournament.format)}</span></div>
       </div>
-    </article>`).join('') : '';
+      ${past ? '<span class="past-label">Passato</span>' : ''}
+    </article>`;
+  }).join('') : '';
   document.body.classList.toggle('admin', admin);
 }
 
@@ -98,6 +111,7 @@ function openModal(type, item) {
 }
 
 window.openEdit = (type, id) => openModal(type, (type === 'team' ? data.teams : data.tournaments).find((item) => item.id === id));
+window.openTournament = (id) => { window.location.href = `torneo.html?id=${encodeURIComponent(id)}`; };
 window.removeItem = (type, id) => {
   if (!confirm('Vuoi eliminare questo elemento?')) return;
   const key = type === 'team' ? 'teams' : 'tournaments';
