@@ -222,14 +222,16 @@ $('#editorForm').addEventListener('submit', (event) => {
   toast(edit.item ? 'Modifiche salvate.' : edit.type === 'team' ? 'Squadra aggiunta!' : 'Torneo pubblicato!');
 });
 
-$('#manageSponsors').addEventListener('click', () => {
+function openSponsorManager() {
   if (!admin) {
     toast('Accedi all’area riservata per gestire gli sponsor.');
     return;
   }
   renderSponsorManager();
   $('#sponsorsBackdrop').classList.add('open');
-});
+}
+window.openSponsorManager = openSponsorManager;
+$('#manageSponsors').addEventListener('click', openSponsorManager);
 $('#addSponsor').addEventListener('click', () => openSponsorEditor());
 $('#closeSponsors').addEventListener('click', () => $('#sponsorsBackdrop').classList.remove('open'));
 $('#sponsorsBackdrop').addEventListener('click', (event) => { if (event.target.id === 'sponsorsBackdrop') $('#sponsorsBackdrop').classList.remove('open'); });

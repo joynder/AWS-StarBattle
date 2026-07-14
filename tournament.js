@@ -39,6 +39,7 @@ function participantIds(tournament) {
 function render() {
   const tournament = currentTournament();
   document.body.classList.toggle('admin', tournamentAdmin);
+  $('#roundRobinActions').hidden = !tournamentAdmin;
   if (!tournament) {
     $('#eventHero').innerHTML = '<p class="eyebrow">TORNEO NON TROVATO</p><h1>Questo torneo non è disponibile.</h1>';
     $('#registrationCopy').textContent = 'Torna alla pagina dei tornei e selezionane uno valido.';
