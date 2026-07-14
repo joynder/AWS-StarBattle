@@ -1,9 +1,11 @@
-const defaultSponsors = [
-  { id: 'sponsor-main', name: 'Logo sponsor', image: 'sponsor-logo-bianco.png', link: '' },
-  { id: 'sponsor-skyrea', name: 'Skyrea Card Game', image: 'sponsor-skyrea.png', link: '' },
-  { id: 'sponsor-bloodbrothers', name: 'Blood Brothers', image: 'sponsor-bloodbrothers.png', link: '' },
-  { id: 'sponsor-bakuten', name: 'Bakuten Box', image: 'sponsor-bakuten-box.png', link: '' }
-];
+const defaultSponsors = [];
+const legacySponsorImages = new Set([
+  'sponsor-logo-bianco.png',
+  'sponsor-skyrea.png',
+  'sponsor-bloodbrothers.png',
+  'sponsor-bakuten-box.png',
+  'sponsor-res.png'
+]);
 
 const defaults = {
   teams: [],
@@ -64,7 +66,7 @@ function removeDemoContent(saved) {
     teams: (Array.isArray(saved?.teams) ? saved.teams : []).filter((team) => !demoTeamNames.includes(team.name)),
     tournaments: (Array.isArray(saved?.tournaments) ? saved.tournaments : []).filter((tournament) => !demoTournamentTitles.includes(tournament.title)),
     rules: typeof saved?.rules === 'string' ? saved.rules : '',
-    sponsors: Array.isArray(saved?.sponsors) ? saved.sponsors : defaultSponsors
+    sponsors: Array.isArray(saved?.sponsors) ? saved.sponsors.filter((sponsor) => !legacySponsorImages.has(sponsor.image)) : defaultSponsors
   };
 }
 
@@ -221,6 +223,10 @@ $('#editorForm').addEventListener('submit', (event) => {
 });
 
 $('#manageSponsors').addEventListener('click', () => {
+  if (!admin) {
+    toast('Accedi all’area riservata per gestire gli sponsor.');
+    return;
+  }
   renderSponsorManager();
   $('#sponsorsBackdrop').classList.add('open');
 });
