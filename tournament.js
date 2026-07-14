@@ -45,7 +45,7 @@ function render() {
     return;
   }
   const ids = participantIds(tournament);
-  $('#eventHero').innerHTML = `<p class="eyebrow">TORNEO AWS</p><h1>${esc(tournament.title)}</h1><div class="event-info"><span><small>DATA · ORA</small>${esc(formatDate(tournament.date))} · ${esc(tournament.time)}</span><span><small>LUOGO</small>${esc(tournament.place)}</span><span><small>FORMATO</small>${esc(tournament.format)}</span></div>`;
+  $('#eventHero').innerHTML = `<p class="eyebrow">TORNEO APRILIA WESTSIDE</p><h1>${esc(tournament.title)}</h1><div class="event-info"><span><small>DATA · ORA</small>${esc(formatDate(tournament.date))} · ${esc(tournament.time)}</span><span><small>LUOGO</small>${esc(tournament.place)}</span><span><small>FORMATO</small>${esc(tournament.format)}</span></div>`;
   $('#registrationCopy').textContent = ids.length ? `${ids.length} ${ids.length === 1 ? 'squadra iscritta' : 'squadre iscritte'}.` : 'Nessuna squadra iscritta.';
   $('#registeredTeams').innerHTML = ids.length ? ids.map((id) => {
     const team = teamById(id);
@@ -152,7 +152,6 @@ async function generateRoundRobin() {
   }
 }
 $('#startTournament').addEventListener('click', generateRoundRobin);
-$('#shuffleTournament').addEventListener('click', generateRoundRobin);
 window.addEventListener('aws-store-ready', async () => {
   try {
     tournamentData = await window.awsStore.load() || { teams: [], tournaments: [] };

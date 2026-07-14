@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#08070b" />
-  <title>AWS Star Battle | Torneo</title>
+  <title>Aprilia WestSide Star Battle | Torneo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -15,13 +15,13 @@
 </head>
 <body>
   <div class="page-glow glow-one"></div><div class="page-glow glow-two"></div>
-  <header class="topbar"><a class="brand" href="index.html" aria-label="AWS Star Battle, torna alla home"><img src="logo-aws.png" alt="Logo AWS Star Battle"><span>AWS <b>STAR BATTLE</b></span></a><div class="top-actions"><span class="status"><i></i> LIVE RANKING</span><a class="admin-toggle rules-link" href="regole.html">Regole</a><button class="admin-toggle" id="adminToggle">Area riservata</button></div></header>
+  <header class="topbar"><a class="brand" href="index.html" aria-label="Aprilia WestSide Star Battle, torna alla home"><img src="logo-aws.png" alt="Logo Aprilia WestSide Star Battle"><span>AWS <b>STAR BATTLE</b></span></a><div class="top-actions"><span class="status"><i></i> LIVE RANKING</span><a class="admin-toggle rules-link" href="regole.html">Regole</a><button class="admin-toggle" id="adminToggle">Area riservata</button></div></header>
   <main class="event-page">
     <a class="back-link" href="index.html#tournaments">← Torna ai tornei</a>
     <section class="event-hero" id="eventHero"></section>
     <div class="event-layout">
       <section class="panel"><h2>Squadre iscritte</h2><p class="panel-copy" id="registrationCopy"></p><div class="registration-list" id="registeredTeams"></div><form class="admin-only" id="registrationForm"><div class="team-picker" id="teamPicker"></div><div class="actions"><button class="add-btn" type="submit">Salva iscrizioni</button></div></form></section>
-      <section class="panel"><h2>Abbinamenti</h2><p class="panel-copy">Formato Round Robin: ogni squadra affronta tutte le altre una volta.</p><div class="admin-only actions"><button class="add-btn" id="startTournament" type="button">Avvia Round Robin</button><button class="action-secondary" id="shuffleTournament" type="button">Rimescola abbinamenti</button></div><div class="rounds" id="rounds"></div></section>
+      <section class="panel"><h2>Abbinamenti</h2><p class="panel-copy">Formato Round Robin: ogni squadra affronta tutte le altre una volta.</p><div class="admin-only actions"><button class="add-btn" id="startTournament" type="button">Avvia Round Robin</button></div><div class="rounds" id="rounds"></div></section>
     </div>
   </main>
   <div class="modal-backdrop" id="loginBackdrop" aria-hidden="true"><section class="modal login-modal" role="dialog" aria-modal="true" aria-labelledby="loginTitle"><button class="close" id="closeLogin" aria-label="Chiudi">×</button><p class="eyebrow">ACCESSO AMMINISTRATORE</p><h3 id="loginTitle">Area riservata</h3><p class="login-copy">Inserisci la password per gestire iscrizioni e abbinamenti.</p><form id="loginForm" action="javascript:void(0)"><label>Password<input id="adminPassword" type="password" autocomplete="current-password" required placeholder="La tua password"></label><button class="form-save" id="loginSubmit" type="button">Accedi</button></form></section></div>

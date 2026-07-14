@@ -1,12 +1,21 @@
+const defaultSponsors = [
+  { id: 'sponsor-main', name: 'Logo sponsor', image: 'sponsor-logo-bianco.png', link: '' },
+  { id: 'sponsor-skyrea', name: 'Skyrea Card Game', image: 'sponsor-skyrea.png', link: '' },
+  { id: 'sponsor-bloodbrothers', name: 'Blood Brothers', image: 'sponsor-bloodbrothers.png', link: '' },
+  { id: 'sponsor-bakuten', name: 'Bakuten Box', image: 'sponsor-bakuten-box.png', link: '' }
+];
+
 const defaults = {
   teams: [],
   tournaments: [],
-  rules: ''
+  rules: '',
+  sponsors: defaultSponsors
 };
 
 let data = JSON.parse(JSON.stringify(defaults));
 let admin = false;
 let edit = {};
+let sponsorEdit = null;
 const $ = (selector) => document.querySelector(selector);
 
 function esc(value) {
@@ -54,7 +63,8 @@ function removeDemoContent(saved) {
   return {
     teams: (Array.isArray(saved?.teams) ? saved.teams : []).filter((team) => !demoTeamNames.includes(team.name)),
     tournaments: (Array.isArray(saved?.tournaments) ? saved.tournaments : []).filter((tournament) => !demoTournamentTitles.includes(tournament.title)),
-    rules: typeof saved?.rules === 'string' ? saved.rules : ''
+    rules: typeof saved?.rules === 'string' ? saved.rules : '',
+    sponsors: Array.isArray(saved?.sponsors) ? saved.sponsors : defaultSponsors
   };
 }
 
@@ -84,7 +94,7 @@ function render() {
     <article class="tournament-card${past ? ' is-past' : ''}" role="link" tabindex="0" onclick='openTournament(${JSON.stringify(tournament.id)})' onkeydown='if(event.key === "Enter" || event.key === " "){event.preventDefault();openTournament(${JSON.stringify(tournament.id)})}'>
       <div class="card-actions" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()"><button class="action" onclick="openEdit('tournament',${tournament.id})">Modifica</button><button class="action delete" onclick="removeItem('tournament',${tournament.id})">Elimina</button></div>
       ${tournament.image ? `<div class="tournament-image"><img src="${esc(tournament.image)}" alt="Immagine del torneo ${esc(tournament.title)}" loading="lazy" onerror="this.parentElement.remove()"></div>` : ''}
-      <p class="eyebrow">TORNEO AWS</p><h3>${esc(tournament.title)}</h3>
+      <p class="eyebrow">TORNEO APRILIA WESTSIDE</p><h3>${esc(tournament.title)}</h3>
       <div class="meta">
         <div><small>DATA · ORA</small><span>${esc(formatTournamentDate(tournament.date))} · ${esc(tournament.time)}</span></div>
         <div><small>LUOGO</small><span>${esc(tournament.place)}</span></div>
@@ -95,8 +105,49 @@ function render() {
       ${past ? '<span class="past-label">Passato</span>' : ''}
     </article>`;
   }).join('') : '';
+  renderSponsors();
   document.body.classList.toggle('admin', admin);
 }
+
+function sponsorLink(link) {
+  try {
+    const url = new URL(link);
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+  } catch {
+    return '';
+  }
+}
+
+function renderSponsors() {
+  const sponsors = Array.isArray(data.sponsors) ? data.sponsors : [];
+  $('#footerSponsorItems').innerHTML = sponsors.map((sponsor, index) => {
+    const image = `<img class="sponsor-image sponsor-index-${index + 1}${index === 3 ? ' sponsor-bakuten' : ''}" src="${esc(sponsor.image)}" alt="${esc(sponsor.name || 'Logo sponsor')}" onerror="this.style.display='none'">`;
+    const link = sponsorLink(sponsor.link);
+    return link ? `<a href="${esc(link)}" aria-label="Visita ${esc(sponsor.name || 'sponsor')}">${image}</a>` : image;
+  }).join('');
+}
+
+function renderSponsorManager() {
+  const sponsors = Array.isArray(data.sponsors) ? data.sponsors : [];
+  $('#sponsorManager').innerHTML = sponsors.length ? sponsors.map((sponsor) => `<div class="sponsor-manager-row"><img src="${esc(sponsor.image)}" alt=""><span>${esc(sponsor.name || 'Sponsor senza nome')}</span><button class="action" type="button" onclick="openSponsorEdit('${esc(sponsor.id)}')">Modifica</button><button class="action delete" type="button" onclick="removeSponsor('${esc(sponsor.id)}')">Elimina</button></div>`).join('') : '<p class="empty-message">Nessuno sponsor inserito.</p>';
+}
+
+function openSponsorEditor(sponsor) {
+  sponsorEdit = sponsor || null;
+  $('#sponsorEditorTitle').textContent = sponsor ? 'Modifica sponsor' : 'Aggiungi sponsor';
+  const form = $('#sponsorForm');
+  form.elements.name.value = sponsor?.name || '';
+  form.elements.image.value = sponsor?.image || '';
+  form.elements.link.value = sponsor?.link || '';
+  $('#sponsorEditorBackdrop').classList.add('open');
+}
+
+window.openSponsorEdit = (id) => openSponsorEditor(data.sponsors.find((sponsor) => String(sponsor.id) === String(id)));
+window.removeSponsor = (id) => {
+  if (!confirm('Vuoi eliminare questo sponsor?')) return;
+  data.sponsors = data.sponsors.filter((sponsor) => String(sponsor.id) !== String(id));
+  persist(); render(); renderSponsorManager(); toast('Sponsor eliminato.');
+};
 
 const fields = {
   team: [['name', 'Nome squadra', 'text'], ['logo', 'URL logo squadra', 'url'], ['stars', 'Numero stelle', 'number']],
@@ -167,6 +218,24 @@ $('#editorForm').addEventListener('submit', (event) => {
   else { item.id = Date.now(); data[key].push(item); }
   persist(); render(); $('#modalBackdrop').classList.remove('open');
   toast(edit.item ? 'Modifiche salvate.' : edit.type === 'team' ? 'Squadra aggiunta!' : 'Torneo pubblicato!');
+});
+
+$('#manageSponsors').addEventListener('click', () => {
+  renderSponsorManager();
+  $('#sponsorsBackdrop').classList.add('open');
+});
+$('#addSponsor').addEventListener('click', () => openSponsorEditor());
+$('#closeSponsors').addEventListener('click', () => $('#sponsorsBackdrop').classList.remove('open'));
+$('#sponsorsBackdrop').addEventListener('click', (event) => { if (event.target.id === 'sponsorsBackdrop') $('#sponsorsBackdrop').classList.remove('open'); });
+$('#closeSponsorEditor').addEventListener('click', () => $('#sponsorEditorBackdrop').classList.remove('open'));
+$('#sponsorEditorBackdrop').addEventListener('click', (event) => { if (event.target.id === 'sponsorEditorBackdrop') $('#sponsorEditorBackdrop').classList.remove('open'); });
+$('#sponsorForm').addEventListener('submit', (event) => {
+  event.preventDefault();
+  const sponsor = Object.fromEntries(new FormData(event.currentTarget));
+  if (sponsorEdit) Object.assign(sponsorEdit, sponsor);
+  else data.sponsors.push({ ...sponsor, id: `sponsor-${Date.now()}` });
+  persist(); render(); renderSponsorManager(); $('#sponsorEditorBackdrop').classList.remove('open');
+  toast(sponsorEdit ? 'Sponsor modificato.' : 'Sponsor aggiunto.');
 });
 
 window.addEventListener('aws-store-ready', async () => {
