@@ -21,12 +21,12 @@
     <section class="event-hero" id="eventHero"></section>
     <div class="event-layout">
       <section class="panel"><h2>Squadre iscritte</h2><p class="panel-copy" id="registrationCopy"></p><div class="registration-list" id="registeredTeams"></div><form class="admin-only" id="registrationForm"><div class="team-picker" id="teamPicker"></div><div class="actions"><button class="add-btn" type="submit">Salva iscrizioni</button></div></form></section>
-      <section class="panel"><h2>Abbinamenti</h2><p class="panel-copy">Formato Round Robin: ogni squadra affronta tutte le altre una volta.</p><div class="admin-only actions" id="roundRobinActions" hidden><button class="add-btn" id="startTournament" type="button">Avvia Round Robin</button></div><div class="rounds" id="rounds"></div></section>
+      <section class="panel"><h2>Abbinamenti</h2><p class="panel-copy">Formato Round Robin: ogni squadra affronta tutte le altre una volta.</p><div class="admin-only actions"><button class="add-btn" id="startTournament" type="button">Avvia Round Robin</button></div><div class="rounds" id="rounds"></div></section>
     </div>
   </main>
   <div class="modal-backdrop" id="loginBackdrop" aria-hidden="true"><section class="modal login-modal" role="dialog" aria-modal="true" aria-labelledby="loginTitle"><button class="close" id="closeLogin" aria-label="Chiudi">×</button><p class="eyebrow">ACCESSO AMMINISTRATORE</p><h3 id="loginTitle">Area riservata</h3><p class="login-copy">Inserisci la password per gestire iscrizioni e abbinamenti.</p><form id="loginForm" action="javascript:void(0)"><label>Password<input id="adminPassword" type="password" autocomplete="current-password" required placeholder="La tua password"></label><button class="form-save" id="loginSubmit" type="button">Accedi</button></form></section></div>
   <div class="toast" id="toast"></div>
-  <script src="tournament.js"></script>
+  <script src="tournament.js?v=20260714-2"></script>
   <script type="module" src="firebase-client.js"></script>
 </body>
 </html>
