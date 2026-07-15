@@ -72,41 +72,21 @@ function openRulesEditor() {
   setTimeout(() => $('#rulesInput').focus(), 50);
 }
 
-async function finishLogin() {
-  if ($('#adminPassword').value !== 'starbattle') {
-    toast('Password non corretta.');
-    return;
-  }
-  rulesAdmin = true;
-  sessionStorage.setItem('awsStarBattleAdmin', 'true');
-  $('#adminPassword').value = '';
-  $('#loginBackdrop').classList.remove('open');
-  render();
-  toast('Benvenuto nell’area riservata.');
-}
-
-$('#adminToggle').addEventListener('click', () => {
-  if (rulesAdmin) {
-    rulesAdmin = false;
-    sessionStorage.removeItem('awsStarBattleAdmin');
-    render();
-    toast('Modalità amministratore disattivata.');
-    return;
-  }
-  $('#loginBackdrop').classList.add('open');
-  setTimeout(() => $('#adminPassword').focus(), 50);
-});
-
 $('#editRules').addEventListener('click', openRulesEditor);
-$('#closeRules').addEventListener('click', () => $('#rulesBackdrop').classList.remove('open'));
-$('#rulesBackdrop').addEventListener('click', (event) => { if (event.target.id === 'rulesBackdrop') $('#rulesBackdrop').classList.remove('open'); });
-$('#closeLogin').addEventListener('click', () => $('#loginBackdrop').classList.remove('open'));
-$('#loginBackdrop').addEventListener('click', (event) => { if (event.target.id === 'loginBackdrop') $('#loginBackdrop').classList.remove('open'); });
-$('#loginSubmit').addEventListener('click', finishLogin);
-$('#loginForm').addEventListener('submit', (event) => { event.preventDefault(); finishLogin(); });
+const closeRulesBtn = $('#closeRules');
+if (closeRulesBtn) closeRulesBtn.addEventListener('click', () => $('#rulesBackdrop').classList.remove('open'));
+const rulesBackdropEl = $('#rulesBackdrop');
+if (rulesBackdropEl) rulesBackdropEl.addEventListener('click', (event) => { if (event.target.id === 'rulesBackdrop') $('#rulesBackdrop').classList.remove('open'); });
 
 $('#rulesForm').addEventListener('submit', async (event) => {
   event.preventDefault();
+  const currentUser = window.awsAuth?.currentUser;
+  const isAdmin = currentUser && currentUser.badges.includes('admin');
+  if (!isAdmin) {
+    toast('Solo gli amministratori possono salvare le regole.');
+    return;
+  }
+
   const rules = $('#rulesInput').value.trim();
   try {
     if (!window.awsStore) throw new Error('storage-not-ready');
@@ -124,8 +104,29 @@ $('#rulesForm').addEventListener('submit', async (event) => {
 window.addEventListener('aws-store-ready', async () => {
   try {
     rulesData = await window.awsStore.load() || {};
-    if (sessionStorage.getItem('awsStarBattleAdmin') === 'true') {
-      rulesAdmin = true;
+    
+    // Listen to Firebase Auth
+    if (window.awsAuth) {
+      window.awsAuth.onAuthChange((user) => {
+        const profileLink = $('#profileLink');
+        const loginLink = $('#loginLink');
+        if (user) {
+          if (profileLink) profileLink.classList.remove('hidden');
+          if (loginLink) loginLink.classList.add('hidden');
+          const avatarEl = $('#navAvatar');
+          const nickEl = $('#navNickname');
+          if (avatarEl) avatarEl.src = user.photoURL;
+          if (nickEl) nickEl.textContent = user.nickname || 'Profilo';
+          
+          rulesAdmin = user.badges && user.badges.includes('admin');
+        } else {
+          if (profileLink) profileLink.classList.add('hidden');
+          if (loginLink) loginLink.classList.remove('hidden');
+          rulesAdmin = false;
+        }
+        document.body.classList.toggle('admin', rulesAdmin);
+        render();
+      });
     }
   } catch {
     rulesData = {};

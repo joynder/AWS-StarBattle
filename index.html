@@ -12,7 +12,15 @@
   <div class="page-glow glow-one"></div><div class="page-glow glow-two"></div>
   <header class="topbar">
     <a class="brand" href="#top" aria-label="Aprilia WestSide Star Battle, torna alla home"><img src="logo-aws.png" alt="Logo Aprilia WestSide Star Battle"><span>AWS <b>STAR BATTLE</b></span></a>
-    <div class="top-actions"><span class="status"><i></i> LIVE RANKING</span><a class="admin-toggle rules-link" href="regole.html">Regole</a><button class="admin-toggle" id="adminToggle">Area riservata</button></div>
+    <div class="top-actions">
+      <span class="status"><i></i> LIVE RANKING</span>
+      <a class="admin-toggle rules-link" href="regole.html">Regole</a>
+      <a class="admin-toggle profile-nav-link hidden" id="profileLink" href="profilo.html">
+        <img class="nav-avatar" id="navAvatar" src="" alt="Avatar">
+        <span id="navNickname">Profilo</span>
+      </a>
+      <a class="admin-toggle profile-nav-link" id="loginLink" href="login.html">Accedi</a>
+    </div>
   </header>
 
   <main id="top">
@@ -43,7 +51,6 @@
   </footer>
 
   <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="close" id="closeModal" aria-label="Chiudi">×</button><p class="eyebrow">AREA RISERVATA</p><h3 id="modalTitle">Titolo</h3><form id="editorForm"></form></section></div>
-  <div class="modal-backdrop" id="loginBackdrop" aria-hidden="true"><section class="modal login-modal" role="dialog" aria-modal="true" aria-labelledby="loginTitle"><button class="close" id="closeLogin" aria-label="Chiudi">×</button><p class="eyebrow">ACCESSO AMMINISTRATORE</p><h3 id="loginTitle">Area riservata</h3><p class="login-copy">Inserisci la password per gestire tornei e classifica.</p><form id="loginForm" action="javascript:void(0)"><label>Password<input id="adminPassword" type="password" autocomplete="current-password" required placeholder="La tua password"></label><button class="form-save" id="loginSubmit" type="button">Accedi</button></form></section></div>
   <div class="modal-backdrop" id="sponsorsBackdrop" aria-hidden="true"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="sponsorsTitle"><button class="close" id="closeSponsors" aria-label="Chiudi">×</button><p class="eyebrow">AREA RISERVATA</p><h3 id="sponsorsTitle">Gestisci sponsor</h3><div class="sponsor-manager" id="sponsorManager"></div><button class="add-btn" id="addSponsor" type="button">+ Aggiungi sponsor</button></section></div>
   <div class="modal-backdrop" id="sponsorEditorBackdrop" aria-hidden="true"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="sponsorEditorTitle"><button class="close" id="closeSponsorEditor" aria-label="Chiudi">×</button><p class="eyebrow">AREA RISERVATA</p><h3 id="sponsorEditorTitle">Sponsor</h3><form id="sponsorForm"><label>Nome sponsor<input name="name" type="text" required></label><label>URL immagine o percorso file<input name="image" type="text" required placeholder="https://... oppure nome-file.png"></label><label>Link di reindirizzamento (facoltativo)<input name="link" type="url" placeholder="https://..."></label><button class="form-save">Salva sponsor</button></form></section></div>
   <div class="toast" id="toast"></div>

@@ -891,6 +891,9 @@ footer .footer-content {
 .rules-actions .add-btn {
   display: none;
 }
+.admin .rules-actions .add-btn {
+  display: inline-flex;
+}
 .rules-card {
   background: var(--bg-panel);
   border: 1px solid var(--line);
@@ -1389,3 +1392,105 @@ footer .footer-content {
     -webkit-backdrop-filter: none !important;
   }
 }
+
+/* Profile Nav & Team Members Styles */
+.profile-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.nav-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--accent-violet);
+  background: #110d1c;
+  box-shadow: 0 0 8px rgba(155, 63, 255, 0.4);
+}
+.profile-nav-link:hover .nav-avatar {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+}
+.team-members-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.team-member-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(155, 63, 255, 0.15);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  gap: 6px;
+  transition: var(--transition);
+}
+.team-member-badge:hover {
+  border-color: var(--accent-cyan);
+  color: var(--text-white);
+  background: rgba(0, 240, 255, 0.05);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+}
+.team-member-badge img {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #110d1c;
+}
+
+/* Badges Styles */
+.badges-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+.badge-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: var(--transition);
+}
+.badge-chip.admin {
+  background: rgba(155, 63, 255, 0.15);
+  border: 1px solid var(--accent-violet);
+  color: #c28cff;
+  box-shadow: 0 0 10px rgba(155, 63, 255, 0.25);
+}
+.badge-chip.club_leader {
+  background: rgba(255, 46, 147, 0.15);
+  border: 1px solid var(--accent-pink);
+  color: #ff85be;
+  box-shadow: 0 0 10px rgba(255, 46, 147, 0.25);
+}
+.badge-chip.team_leader {
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid var(--accent-cyan);
+  color: #9cffff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+}
+.badge-chip.charm {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-white);
+}
+
+.hidden {
+  display: none !important;
+}
+
+

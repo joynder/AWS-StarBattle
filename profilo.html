@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#10051d" />
+  <title>Aprilia WestSide Star Battle | Profilo Blader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20260714-1" />
+  <style>
+    .profile-page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.8fr;
+      gap: 30px;
+      margin-top: 30px;
+    }
+    @media (max-width: 900px) {
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 30px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      margin-bottom: 24px;
+    }
+    .panel h2 {
+      font: 700 24px var(--font-heading);
+      margin: 0 0 20px;
+      border-bottom: 1px solid rgba(155, 63, 255, 0.2);
+      padding-bottom: 12px;
+      color: var(--text-white);
+      letter-spacing: 1px;
+    }
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .current-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--accent-violet);
+      box-shadow: 0 0 20px rgba(155, 63, 255, 0.5);
+      background: #110d1c;
+    }
+    .upload-area {
+      margin-top: 14px;
+    }
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+    .file-input-btn {
+      border: 1px dashed var(--accent-violet);
+      background: rgba(155, 63, 255, 0.05);
+      color: var(--text-white);
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .file-input-btn:hover {
+      border-color: var(--accent-cyan);
+      background: rgba(0, 240, 255, 0.05);
+    }
+    .file-input-wrapper input[type=file] {
+      font-size: 100px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .invitations-panel {
+      border: 1.5px solid var(--accent-pink);
+      background: rgba(255, 46, 147, 0.04);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 15px rgba(255, 46, 147, 0.15);
+    }
+    .invitation-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: rgba(3, 2, 6, 0.5);
+      border: 1.5px solid rgba(255, 46, 147, 0.3);
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .invitation-team-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .invitation-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .inv-btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: var(--font-cyber);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .inv-btn.accept {
+      background: rgba(0, 240, 255, 0.1);
+      border: 1.5px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+    .inv-btn.accept:hover {
+      background: var(--accent-cyan);
+      color: #10051d;
+    }
+    .inv-btn.decline {
+      background: rgba(255, 46, 147, 0.1);
+      border: 1.5px solid var(--accent-pink);
+      color: var(--accent-pink);
+    }
+    .inv-btn.decline:hover {
+      background: var(--accent-pink);
+      color: var(--text-white);
+    }
+    .search-section {
+      margin-top: 24px;
+      border-top: 1px dashed rgba(155, 63, 255, 0.2);
+      padding-top: 20px;
+    }
+    .search-results {
+      margin-top: 14px;
+      max-height: 180px;
+      overflow-y: auto;
+      background: rgba(3, 2, 6, 0.3);
+      border-radius: 8px;
+      border: 1px solid rgba(155, 63, 255, 0.15);
+    }
+    .search-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(155, 63, 255, 0.1);
+    }
+    .search-item:last-child {
+      border-bottom: 0;
+    }
+    .search-user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .search-user-info img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .invite-btn {
+      background: var(--accent-violet);
+      border: 0;
+      color: var(--text-white);
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: var(--font-cyber);
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    .invite-btn:hover {
+      background: var(--accent-cyan);
+      color: #10051d;
+    }
+    .invite-btn:disabled {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+    .my-team {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .my-team-logo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+    }
+    .my-team h3 {
+      font: 700 24px var(--font-heading);
+      margin: 0;
+      color: var(--text-white);
+    }
+    .my-team-stars {
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 18px;
+      text-shadow: 0 0 10px rgba(255, 200, 55, 0.4);
+    }
+    .team-members-list {
+      width: 100%;
+      margin-top: 24px;
+      border-top: 1px solid rgba(155, 63, 255, 0.2);
+      padding-top: 20px;
+      text-align: left;
+    }
+    .team-members-list h4 {
+      margin: 0 0 14px;
+      font-family: var(--font-heading);
+      font-size: 14px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+    .member-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.01);
+      margin-bottom: 8px;
+    }
+    .member-row img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #110d1c;
+    }
+    .member-row span {
+      font-weight: 600;
+    }
+    .member-row .role-label {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .danger-btn {
+      background: rgba(255, 46, 147, 0.1);
+      border: 1px solid var(--accent-pink);
+      color: var(--accent-pink);
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font-cyber);
+      font-size: 14px;
+      font-weight: 600;
+      transition: var(--transition);
+      margin-top: 20px;
+    }
+    .danger-btn:hover {
+      background: var(--accent-pink);
+      color: var(--text-white);
+      box-shadow: 0 0 15px rgba(255, 46, 147, 0.4);
+    }
+    .team-manage-form {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px dashed rgba(155, 63, 255, 0.2);
+      width: 100%;
+      text-align: left;
+    }
+    .team-manage-form h4 {
+      margin: 0 0 12px;
+      font-family: var(--font-heading);
+      font-size: 14px;
+      color: var(--text-white);
+    }
+    .logout-btn-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+    .logout-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font-cyber);
+      font-size: 13px;
+      transition: var(--transition);
+    }
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-white);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-glow glow-one"></div><div class="page-glow glow-two"></div>
+  
+  <header class="topbar">
+    <a class="brand" href="index.html"><img src="logo-aws.png" alt="Logo Aprilia WestSide Star Battle"><span>AWS <b>STAR BATTLE</b></span></a>
+    <div class="top-actions">
+      <span class="status"><i></i> LIVE RANKING</span>
+      <a class="admin-toggle rules-link" href="regole.html">Regole</a>
+      <a class="admin-toggle profile-nav-link hidden" id="profileLink" href="profilo.html">
+        <img class="nav-avatar" id="navAvatar" src="" alt="Avatar">
+        <span id="navNickname">Profilo</span>
+      </a>
+      <a class="admin-toggle profile-nav-link" id="loginLink" href="login.html">Accedi</a>
+    </div>
+  </header>
+
+  <main class="profile-page">
+    
+    <!-- PANNELLO INVITI RICEVUTI (Sempre in evidenza) -->
+    <section class="invitations-panel hidden" id="invitationsPanel">
+      <h2 style="font-family: var(--font-heading); color: var(--accent-pink); font-size: 18px; margin: 0 0 14px;">✉ Inviti Squadra Ricevuti</h2>
+      <div id="invitationsContainer"></div>
+    </section>
+
+    <div class="profile-grid">
+      
+      <!-- DETTAGLI PROFILO -->
+      <section class="panel">
+        <h2>Dettagli Blader</h2>
+        
+        <div class="profile-header">
+          <img class="current-avatar" id="profileAvatar" src="" alt="Foto profilo">
+          <div class="badges-container" id="profileBadges"></div>
+          <div id="profileEmail" style="color: var(--text-muted); font-size: 14px; margin-top: 8px;"></div>
+        </div>
+
+        <form id="profileForm" action="javascript:void(0)">
+          <label>Nickname
+            <input type="text" id="nicknameInput" required placeholder="Inserisci il tuo nickname">
+          </label>
+          
+          <label>Carica un file avatar</label>
+          <div class="upload-area">
+            <div class="file-input-wrapper">
+              <span class="file-input-btn" id="fileLabel">Seleziona Immagine (.png, .jpg)</span>
+              <input type="file" id="avatarFileInput" accept="image/png, image/jpeg">
+            </div>
+          </div>
+
+          <label>O inserisci URL immagine personalizzato</label>
+          <input type="url" id="photoUrlInput" placeholder="https://...">
+
+          <button class="form-save" style="width: 100%; margin-top: 24px;" type="submit">Salva Profilo</button>
+        </form>
+
+        <!-- SEZIONE TEST PER CAMBIARE BADGE MANUALMENTE (COLLEGATA A SVILUPPO) -->
+        <div style="margin-top: 28px; padding: 16px; border: 1px dashed rgba(155, 63, 255, 0.4); border-radius: 12px; background: rgba(155, 63, 255, 0.02);">
+          <h4 style="margin: 0 0 10px; font-family: var(--font-heading); font-size: 12px; color: var(--accent-pink); letter-spacing: 0.5px;">STRUMENTI TEST RUOLI (LOCAL & DEMO)</h4>
+          <label style="display:flex; align-items:center; gap:8px; text-transform:none; font-size:13px; color:var(--text-white); margin-bottom:8px; cursor:pointer;">
+            <input type="checkbox" id="testAdminBadge" style="width:auto; cursor:pointer;"> Badge <strong>ADMIN</strong> (sostituisce Area Riservata)
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; text-transform:none; font-size:13px; color:var(--text-white); cursor:pointer;">
+            <input type="checkbox" id="testClubBadge" style="width:auto; cursor:pointer;"> Badge <strong>CLUB LEADER</strong> (tornei personali)
+          </label>
+        </div>
+      </section>
+
+      <!-- SEZIONE SQUADRA -->
+      <section class="panel" id="teamPanel">
+        <h2>Squadra</h2>
+        <div id="teamLoading" class="empty-message">Caricamento squadra...</div>
+        
+        <!-- Tab Squadra (Utente senza squadra) -->
+        <div id="noTeamContent" class="hidden">
+          <p class="panel-copy" style="margin-bottom: 20px;">Non fai ancora parte di nessuna squadra blader. Creane una nuova per competere nella Hall of Fame!</p>
+          
+          <form id="createTeamForm" action="javascript:void(0)">
+            <label>Nome Squadra
+              <input type="text" name="teamName" required placeholder="Es. Black Wolves">
+            </label>
+            <label>URL Logo Squadra
+              <input type="url" name="teamLogo" placeholder="Lascia vuoto per logo predefinito o inserisci un URL">
+            </label>
+            <button class="form-save" style="margin-top: 14px; width: 100%;">Crea Squadra</button>
+          </form>
+        </div>
+
+        <!-- Tab Squadra (Utente in una squadra) -->
+        <div id="myTeamContent" class="hidden">
+          <div class="my-team">
+            <img class="my-team-logo" id="myTeamLogo" src="" alt="Logo Squadra">
+            <h3 id="myTeamName">Nome Squadra</h3>
+            <div class="my-team-stars" id="myTeamStars">★ 3 Stelle</div>
+            <div class="badges-container" id="myTeamRoleBadge"></div>
+
+            <div class="team-members-list">
+              <h4>Membri della Squadra (max 3)</h4>
+              <div id="teamMembersContainer"></div>
+            </div>
+
+            <!-- Modifica Squadra (Solo Leader) - Sostituisce il form Crea Squadra -->
+            <div class="team-manage-form hidden" id="leaderControls">
+              <h2>Modifica Squadra</h2>
+              <form id="updateTeamForm" action="javascript:void(0)">
+                <label>Modifica Nome Squadra
+                  <input type="text" id="updateTeamNameInput" required>
+                </label>
+                <label>Modifica URL Logo
+                  <input type="url" id="updateTeamLogoInput">
+                </label>
+                <button class="form-save" style="width: 100%; margin-top: 14px;">Aggiorna Dati Squadra</button>
+              </form>
+
+              <!-- Ricerca e invito utenti -->
+              <div class="search-section">
+                <h4>Invita Giocatore (Blader)</h4>
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" id="userSearchInput" placeholder="Cerca nickname..." style="flex: 1;">
+                  <button class="form-save" id="userSearchBtn" style="padding: 0 16px; margin: 0;">Cerca</button>
+                </div>
+                <div class="search-results hidden" id="searchResultsContainer"></div>
+              </div>
+
+              <button class="danger-btn" style="width: 100%; margin-top: 30px;" id="disbandTeamBtn">Sciogli Squadra</button>
+            </div>
+
+            <!-- Pulsante Abbandona (Solo Membro) -->
+            <button class="danger-btn" style="width: 100%;" id="leaveTeamBtn">Abbandona Squadra</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="logout-btn-container">
+      <button class="logout-btn" id="logoutBtn" style="border-color: rgba(255, 46, 147, 0.3); color: var(--accent-pink);">Esci dall'account</button>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="firebase-client.js"></script>
+  <script type="module">
+    function toast(message) {
+      const element = document.getElementById('toast');
+      element.textContent = message;
+      element.classList.add('show');
+      setTimeout(() => element.classList.remove('show'), 2500);
+    }
+
+    const fileInput = document.getElementById('avatarFileInput');
+    const fileLabel = document.getElementById('fileLabel');
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        fileLabel.textContent = `Selezionato: ${fileInput.files[0].name}`;
+        document.getElementById('photoUrlInput').value = '';
+      }
+    });
+
+    window.addEventListener('aws-store-ready', () => {
+      const auth = window.awsAuth;
+      const store = window.awsStore;
+
+      // Gestione stato di autenticazione e rendering profilo
+      auth.onAuthChange(async (user) => {
+        if (!user) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Allinea Topbar
+        const profileLink = document.getElementById('profileLink');
+        const loginLink = document.getElementById('loginLink');
+        if (profileLink) profileLink.classList.remove('hidden');
+        if (loginLink) loginLink.classList.add('hidden');
+        const navAvatar = document.getElementById('navAvatar');
+        const navNickname = document.getElementById('navNickname');
+        if (navAvatar) navAvatar.src = user.photoURL;
+        if (navNickname) navNickname.textContent = user.nickname;
+
+        // Dettagli Profilo
+        document.getElementById('profileEmail').textContent = user.email;
+        document.getElementById('nicknameInput').value = user.nickname || '';
+        document.getElementById('profileAvatar').src = user.photoURL;
+        document.getElementById('photoUrlInput').value = user.photoURL.startsWith('https://placehold.co') ? '' : user.photoURL;
+
+        // Render Badge Profilo
+        renderBadges(user.badges);
+
+        // Configura Test/Dev Checkbox
+        const testAdmin = document.getElementById('testAdminBadge');
+        const testClub = document.getElementById('testClubBadge');
+        testAdmin.checked = (user.badges || []).includes('admin');
+        testClub.checked = (user.badges || []).includes('club_leader');
+
+        // Carica dati del team e inviti
+        await loadTeamAndInvitations(user);
+      });
+
+      // Salva Profilo
+      document.getElementById('profileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nickname = document.getElementById('nicknameInput').value.trim();
+        const customUrl = document.getElementById('photoUrlInput').value.trim();
+        
+        let photoURL = customUrl;
+
+        try {
+          if (fileInput.files.length > 0) {
+            toast('Caricamento immagine in corso...');
+            photoURL = await auth.uploadProfilePhoto(fileInput.files[0]);
+          }
+
+          await auth.updateProfile(nickname, photoURL);
+          toast('Profilo aggiornato con successo!');
+          setTimeout(() => location.reload(), 1200);
+        } catch (error) {
+          console.error(error);
+          toast('Impossibile salvare il profilo.');
+        }
+      });
+
+      // Gestione cambio dei badge per test/dev
+      const saveTestBadges = async () => {
+        const user = auth.currentUser;
+        const testAdmin = document.getElementById('testAdminBadge').checked;
+        const testClub = document.getElementById('testClubBadge').checked;
+        
+        const newBadges = [];
+        if (testAdmin) newBadges.push('admin');
+        if (testClub) newBadges.push('club_leader');
+        if (user.role === 'leader' || user.badges.includes('team_leader')) {
+          newBadges.push('team_leader');
+        }
+
+        user.badges = newBadges;
+        
+        // Salva
+        if (window.AWS_FIREBASE_CONFIG?.apiKey) {
+          const { doc, getFirestore, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+          await setDoc(doc(getFirestore(), 'users', user.uid), { badges: newBadges }, { merge: true });
+        } else {
+          localStorage.setItem('awsStarBattleUser', JSON.stringify(user));
+        }
+        
+        toast('Badge aggiornati per il test!');
+        renderBadges(newBadges);
+        
+        // Rerender team panel to ensure everything is aligned
+        setTimeout(() => location.reload(), 800);
+      };
+      
+      document.getElementById('testAdminBadge').addEventListener('change', saveTestBadges);
+      document.getElementById('testClubBadge').addEventListener('change', saveTestBadges);
+
+      function renderBadges(badges = []) {
+        const container = document.getElementById('profileBadges');
+        container.innerHTML = '';
+        badges.forEach(b => {
+          const span = document.createElement('span');
+          span.className = `badge-chip ${b}`;
+          span.textContent = b.replace('_', ' ');
+          container.appendChild(span);
+        });
+      }
+
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await auth.logout();
+        window.location.href = 'login.html';
+      });
+
+      // Carica Dati Team e Inviti
+      async function loadTeamAndInvitations(user) {
+        document.getElementById('teamLoading').classList.add('hidden');
+        
+        const data = await store.load();
+        const teams = data.teams || [];
+        
+        // Cerca se l'utente fa parte di un team
+        let team = teams.find(t => String(t.id) === String(user.teamId) || (t.members || []).includes(user.uid));
+
+        // Gestione visualizzazione notifiche inviti
+        await loadInvitationsList(user, team);
+
+        if (team) {
+          document.getElementById('noTeamContent').classList.add('hidden');
+          document.getElementById('myTeamContent').classList.remove('hidden');
+
+          document.getElementById('myTeamLogo').src = team.logo || 'https://placehold.co/90x90/41156d/fff?text=★';
+          document.getElementById('myTeamName').textContent = team.name;
+          document.getElementById('myTeamStars').textContent = `★ ${team.stars || 0} Stelle`;
+          
+          const isLeader = team.ownerId === user.uid;
+          const roleBadgeContainer = document.getElementById('myTeamRoleBadge');
+          roleBadgeContainer.innerHTML = `<span class="badge-chip ${isLeader ? 'admin' : 'charm'}">${isLeader ? 'Caposquadra' : 'Membro'}</span>`;
+
+          // Mostra membri
+          const membersList = document.getElementById('teamMembersContainer');
+          membersList.innerHTML = '';
+          const details = team.membersDetails || [];
+          (team.members || []).forEach(uid => {
+            const memberDetail = details.find(d => d.uid === uid) || { uid, nickname: 'Blader in attesa', photoURL: '' };
+            const isMemLeader = team.ownerId === uid;
+            
+            const div = document.createElement('div');
+            div.className = 'member-row';
+            div.innerHTML = `
+              <img src="${memberDetail.photoURL || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + uid}" alt="">
+              <span>${memberDetail.nickname || 'Blader'}</span>
+              <span class="role-label">${isMemLeader ? 'Caposquadra' : 'Membro'}</span>
+            `;
+            membersList.appendChild(div);
+          });
+
+          // Mostra i controlli corretti
+          if (isLeader) {
+            document.getElementById('leaderControls').classList.remove('hidden');
+            document.getElementById('leaveTeamBtn').classList.add('hidden');
+            document.getElementById('updateTeamNameInput').value = team.name;
+            document.getElementById('updateTeamLogoInput').value = team.logo || '';
+            
+            // Attiva la ricerca utenti
+            setupUserSearch(team);
+          } else {
+            document.getElementById('leaderControls').classList.add('hidden');
+            document.getElementById('leaveTeamBtn').classList.remove('hidden');
+          }
+        } else {
+          // L'utente non ha una squadra
+          document.getElementById('myTeamContent').classList.add('hidden');
+          document.getElementById('noTeamContent').classList.remove('hidden');
+        }
+      }
+
+      // Gestione caricamento inviti ricevuti
+      async function loadInvitationsList(user, currentTeam) {
+        const panel = document.getElementById('invitationsPanel');
+        const container = document.getElementById('invitationsContainer');
+        container.innerHTML = '';
+
+        try {
+          const invs = await auth.getPendingInvitations(user.uid);
+          
+          if (invs.length > 0) {
+            panel.classList.remove('hidden');
+            invs.forEach(inv => {
+              const div = document.createElement('div');
+              div.className = 'invitation-item';
+              div.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <img class="invitation-team-logo" src="${inv.teamLogo || 'https://placehold.co/90x90/41156d/fff?text=★'}" alt="">
+                  <div>
+                    <strong style="color:var(--text-white);">${inv.teamName}</strong>
+                    <div style="font-size:12px; color:var(--text-muted);">Sei stato invitato a far parte della squadra!</div>
+                  </div>
+                </div>
+                <div class="invitation-actions">
+                  <button class="inv-btn accept" data-id="${inv.id}">Accetta</button>
+                  <button class="inv-btn decline" data-id="${inv.id}">Declina</button>
+                </div>
+              `;
+              
+              // Pulsante Declina
+              div.querySelector('.inv-btn.decline').addEventListener('click', async () => {
+                await auth.respondToInvitation(inv.id, 'declined');
+                toast('Invito rifiutato.');
+                await loadInvitationsList(user, currentTeam);
+              });
+              
+              // Pulsante Accetta
+              div.querySelector('.inv-btn.accept').addEventListener('click', async () => {
+                if (currentTeam) {
+                  const confirmChange = confirm(`Fai già parte della squadra "${currentTeam.name}". Se accetti l'invito, lascerai la squadra corrente. Vuoi procedere?`);
+                  if (!confirmChange) return;
+                  
+                  // Esci o sciogli squadra corrente
+                  await leaveOrDisbandCurrentTeam(user, currentTeam);
+                }
+                
+                await acceptInvitationAction(user, inv);
+              });
+
+              container.appendChild(div);
+            });
+          } else {
+            panel.classList.add('hidden');
+          }
+        } catch (error) {
+          console.error("Error loading invitations", error);
+        }
+      }
+
+      // Abbandona o sciogli la squadra attuale dell'utente prima di accettare un invito
+      async function leaveOrDisbandCurrentTeam(user, team) {
+        const data = await store.load();
+        const isLeader = team.ownerId === user.uid;
+
+        if (isLeader) {
+          // Sciogli la squadra
+          data.teams = (data.teams || []).filter(t => String(t.id) !== String(team.id));
+          await store.save(data);
+
+          // Svincola tutti i membri del team
+          const membersUids = team.members || [];
+          if (window.AWS_FIREBASE_CONFIG?.apiKey) {
+            const { doc, getFirestore, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+            const db = getFirestore();
+            for (const uid of membersUids) {
+              try {
+                await setDoc(doc(db, 'users', uid), { teamId: null, role: null }, { merge: true });
+              } catch (e) {}
+            }
+          }
+        } else {
+          // Lascia la squadra
+          data.teams = (data.teams || []).map(t => {
+            if (String(t.id) === String(team.id)) {
+              t.members = (t.members || []).filter(uid => uid !== user.uid);
+              t.membersDetails = (t.membersDetails || []).filter(m => m.uid !== user.uid);
+            }
+            return t;
+          });
+          await store.save(data);
+        }
+
+        // Resetta lo stato locale
+        user.teamId = null;
+        user.role = null;
+        if (!window.AWS_FIREBASE_CONFIG?.apiKey) {
+          localStorage.setItem('awsStarBattleUser', JSON.stringify(user));
+        }
+      }
+
+      // Accetta invito e inserisci l'utente nella nuova squadra
+      async function acceptInvitationAction(user, inv) {
+        try {
+          const data = await store.load();
+          const targetTeam = (data.teams || []).find(t => String(t.id) === String(inv.teamId));
+          
+          if (!targetTeam) {
+            toast('La squadra per questo invito non esiste più.');
+            await auth.respondToInvitation(inv.id, 'declined');
+            setTimeout(() => location.reload(), 1500);
+            return;
+          }
+
+          if ((targetTeam.members || []).length >= 3) {
+            toast('Impossibile entrare: la squadra è già al completo (max 3 membri).');
+            return;
+          }
+
+          // Aggiungi utente
+          targetTeam.members = targetTeam.members || [];
+          if (!targetTeam.members.includes(user.uid)) {
+            targetTeam.members.push(user.uid);
+          }
+          
+          targetTeam.membersDetails = targetTeam.membersDetails || [];
+          if (!targetTeam.membersDetails.some(m => m.uid === user.uid)) {
+            targetTeam.membersDetails.push({
+              uid: user.uid,
+              nickname: user.nickname,
+              photoURL: user.photoURL
+            });
+          }
+
+          await store.save(data);
+
+          // Rispondi all'invito (lo cancella/archivia)
+          await auth.respondToInvitation(inv.id, 'accepted');
+
+          // Aggiorna profilo utente
+          user.teamId = inv.teamId;
+          user.role = 'member';
+          
+          if (!user.badges.includes('team_leader')) {
+            // rimuovi team_leader se era prima
+            user.badges = user.badges.filter(b => b !== 'team_leader');
+          }
+
+          if (window.AWS_FIREBASE_CONFIG?.apiKey) {
+            const { doc, getFirestore, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+            await setDoc(doc(getFirestore(), 'users', user.uid), { teamId: inv.teamId, role: 'member', badges: user.badges }, { merge: true });
+          } else {
+            localStorage.setItem('awsStarBattleUser', JSON.stringify(user));
+          }
+
+          toast(`Ti sei unito alla squadra "${targetTeam.name}"!`);
+          setTimeout(() => location.reload(), 1500);
+        } catch (e) {
+          console.error(e);
+          toast("Errore nell'accettare l'invito.");
+        }
+      }
+
+      // Ricerca utenti e inviti
+      function setupUserSearch(team) {
+        const searchBtn = document.getElementById('userSearchBtn');
+        const searchInput = document.getElementById('userSearchInput');
+        const container = document.getElementById('searchResultsContainer');
+
+        const performSearch = async () => {
+          const query = searchInput.value.trim();
+          if (query.length < 2) {
+            toast('Inserisci almeno 2 caratteri per la ricerca.');
+            return;
+          }
+          
+          container.innerHTML = '<div style="padding:10px; color:var(--text-muted); font-size:13px;">Ricerca in corso...</div>';
+          container.classList.remove('hidden');
+
+          try {
+            const users = await auth.searchUsers(query);
+            container.innerHTML = '';
+            
+            if (users.length === 0) {
+              container.innerHTML = '<div style="padding:10px; color:var(--text-muted); font-size:13px;">Nessun giocatore trovato.</div>';
+              return;
+            }
+
+            users.forEach(u => {
+              const div = document.createElement('div');
+              div.className = 'search-item';
+              
+              const isAlreadyMember = (team.members || []).includes(u.uid);
+              
+              div.innerHTML = `
+                <div class="search-user-info">
+                  <img src="${u.photoURL || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + u.uid}" alt="">
+                  <div>
+                    <strong>${u.nickname}</strong>
+                    <div style="font-size:10px; color:var(--text-muted);">${u.email}</div>
+                  </div>
+                </div>
+                <button class="invite-btn" ${isAlreadyMember ? 'disabled' : ''}>
+                  ${isAlreadyMember ? 'Già membro' : 'Invita'}
+                </button>
+              `;
+
+              if (!isAlreadyMember) {
+                div.querySelector('.invite-btn').addEventListener('click', async (btnEv) => {
+                  btnEv.target.disabled = true;
+                  btnEv.target.textContent = 'Inviato';
+                  try {
+                    const fromUid = auth.currentUser.uid;
+                    await auth.sendInvitation(team.id, team.name, team.logo, fromUid, u.uid, u.nickname);
+                    toast(`Invito inviato a ${u.nickname}!`);
+                  } catch (err) {
+                    console.error(err);
+                    toast('Errore durante l\'invio dell\'invito.');
+                    btnEv.target.disabled = false;
+                    btnEv.target.textContent = 'Invita';
+                  }
+                });
+              }
+
+              container.appendChild(div);
+            });
+          } catch (err) {
+            console.error(err);
+            container.innerHTML = '<div style="padding:10px; color:var(--accent-pink); font-size:13px;">Errore nella ricerca.</div>';
+          }
+        };
+
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') performSearch();
+        });
+      }
+
+      // Crea una squadra
+      document.getElementById('createTeamForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const name = form.elements.teamName.value.trim();
+        const logo = form.elements.teamLogo.value.trim() || 'https://placehold.co/90x90/41156d/fff?text=★';
+        const user = auth.currentUser;
+
+        try {
+          const data = await store.load();
+          
+          if ((data.teams || []).some(t => t.name.toLowerCase() === name.toLowerCase())) {
+            toast('Esiste già una squadra con questo nome.');
+            return;
+          }
+
+          const newTeamId = Date.now();
+          const newTeam = {
+            id: newTeamId,
+            name: name,
+            logo: logo,
+            stars: 3,
+            ownerId: user.uid,
+            members: [user.uid],
+            membersDetails: [{
+              uid: user.uid,
+              nickname: user.nickname,
+              photoURL: user.photoURL
+            }]
+          };
+
+          data.teams = data.teams || [];
+          data.teams.push(newTeam);
+          await store.save(data);
+
+          // Aggiungi badge team_leader
+          user.teamId = newTeamId;
+          user.role = 'leader';
+          if (!user.badges.includes('team_leader')) {
+            user.badges.push('team_leader');
+          }
+
+          if (window.AWS_FIREBASE_CONFIG?.apiKey) {
+            const { doc, getFirestore, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+            await setDoc(doc(getFirestore(), 'users', user.uid), { teamId: newTeamId, role: 'leader', badges: user.badges }, { merge: true });
+          } else {
+            localStorage.setItem('awsStarBattleUser', JSON.stringify(user));
+          }
+
+          toast('Squadra creata con successo!');
+          setTimeout(() => location.reload(), 1500);
+        } catch (error) {
+          console.error(error);
+          toast('Impossibile creare la squadra.');
+        }
+      });
+
+      // Modifica Squadra
+      document.getElementById('updateTeamForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('updateTeamNameInput').value.trim();
+        const logo = document.getElementById('updateTeamLogoInput').value.trim();
+        const user = auth.currentUser;
+
+        try {
+          const data = await store.load();
+          data.teams = (data.teams || []).map(t => {
+            if (String(t.id) === String(user.teamId)) {
+              t.name = name;
+              t.logo = logo || 'https://placehold.co/90x90/41156d/fff?text=★';
+            }
+            return t;
+          });
+          await store.save(data);
+          toast('Squadra aggiornata con successo!');
+          setTimeout(() => location.reload(), 1500);
+        } catch (error) {
+          console.error(error);
+          toast('Impossibile aggiornare la squadra.');
+        }
+      });
+
+      // Sciogli Squadra (Leader)
+      document.getElementById('disbandTeamBtn').addEventListener('click', async () => {
+        if (!confirm('Sei sicuro di voler sciogliere questa squadra? Verrà rimossa dalla classifica e tutti i membri torneranno svincolati.')) return;
+        const user = auth.currentUser;
+
+        try {
+          const data = await store.load();
+          const team = (data.teams || []).find(t => String(t.id) === String(user.teamId));
+          if (!team) return;
+
+          data.teams = (data.teams || []).filter(t => String(t.id) !== String(user.teamId));
+          await store.save(data);
+
+          // Svincola i membri su Firebase
+          const membersUids = team.members || [];
+          if (window.AWS_FIREBASE_CONFIG?.apiKey) {
+            const { doc, getFirestore, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+            const db = getFirestore();
+            for (const uid of membersUids) {
+              try {
+                // Rimuoviamo teamId e role da tutti i membri
+                await setDoc(doc(db, 'users', uid), { teamId: null, role: null }, { merge: true });
+              } catch (e) {}
+            }
+          }
+
+          // Aggiorna profilo del leader
+          user.teamId = null;
+          user.role = null;
+          user.badges = user.badges.filter(b => b !== 'team_leader');
+          
+          if (window.AWS_FIREBASE_CONFIG?.apiKey) {
+            const { doc, getFirestore, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+            await setDoc(doc(getFirestore(), 'users', user.uid), { teamId: null, role: null, badges: user.badges }, { merge: true });
+          } else {
+            localStorage.setItem('awsStarBattleUser', JSON.stringify(user));
+          }
+
+          toast('Squadra sciolta.');
+          setTimeout(() => location.reload(), 1500);
+        } catch (error) {
+          console.error(error);
+          toast('Impossibile sciogliere la squadra.');
+        }
+      });
+
+      // Abbandona Squadra (Membro)
+      document.getElementById('leaveTeamBtn').addEventListener('click', async () => {
+        if (!confirm('Sei sicuro di voler lasciare questa squadra?')) return;
+        const user = auth.currentUser;
+
+        try {
+          const data = await store.load();
+          data.teams = (data.teams || []).map(t => {
+            if (String(t.id) === String(user.teamId)) {
+              t.members = (t.members || []).filter(uid => uid !== user.uid);
+              t.membersDetails = (t.membersDetails || []).filter(m => m.uid !== user.uid);
+            }
+            return t;
+          });
+          await store.save(data);
+
+          // Aggiorna profilo utente
+          user.teamId = null;
+          user.role = null;
+          user.badges = user.badges.filter(b => b !== 'team_leader');
+
+          if (window.AWS_FIREBASE_CONFIG?.apiKey) {
+            const { doc, getFirestore, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+            await setDoc(doc(getFirestore(), 'users', user.uid), { teamId: null, role: null, badges: user.badges }, { merge: true });
+          } else {
+            localStorage.setItem('awsStarBattleUser', JSON.stringify(user));
+          }
+
+          toast('Hai lasciato la squadra.');
+          setTimeout(() => location.reload(), 1500);
+        } catch (error) {
+          console.error(error);
+          toast('Errore nell\'abbandono della squadra.');
+        }
+      });
+
+    });
+  </script>
+</body>
+</html>
