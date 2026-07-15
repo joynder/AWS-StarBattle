@@ -177,30 +177,22 @@ async function finishLogin() {
     toast('Password non corretta.');
     return;
   }
-  try {
-    if (window.awsStore?.login) {
-      const allowed = await window.awsStore.login();
-      if (allowed?.redirecting) {
-        toast('Reindirizzamento a Google in corso…');
-        return;
-      }
-      if (!allowed) {
-        toast('Questo account Google non è autorizzato.');
-        return;
-      }
-    }
-    admin = true;
-    $('#adminPassword').value = '';
-    $('#loginBackdrop').classList.remove('open');
-    render();
-    toast('Benvenuto nell’area riservata.');
-  } catch (error) {
-    toast(window.awsStore?.loginErrorMessage?.(error) || 'Accesso non completato. Riprova.');
-  }
+  admin = true;
+  sessionStorage.setItem('awsStarBattleAdmin', 'true');
+  $('#adminPassword').value = '';
+  $('#loginBackdrop').classList.remove('open');
+  render();
+  toast('Benvenuto nell’area riservata.');
 }
 
 $('#adminToggle').addEventListener('click', () => {
-  if (admin) { admin = false; render(); toast('Modalità amministratore disattivata.'); return; }
+  if (admin) { 
+    admin = false; 
+    sessionStorage.removeItem('awsStarBattleAdmin');
+    render(); 
+    toast('Modalità amministratore disattivata.'); 
+    return; 
+  }
   $('#loginBackdrop').classList.add('open');
   setTimeout(() => $('#adminPassword').focus(), 50);
 });
@@ -250,14 +242,8 @@ window.addEventListener('aws-store-ready', async () => {
   try {
     const saved = await window.awsStore.load();
     data = removeDemoContent(saved);
-    const redirectLogin = window.awsStore.consumeRedirectLogin?.();
-    if (redirectLogin === true) {
+    if (sessionStorage.getItem('awsStarBattleAdmin') === 'true') {
       admin = true;
-      toast('Benvenuto nell’area riservata.');
-    } else if (redirectLogin === false) {
-      toast('Questo account Google non è autorizzato.');
-    } else if (redirectLogin?.error) {
-      toast(window.awsStore.loginErrorMessage?.({ code: redirectLogin.error }) || 'Accesso non completato. Riprova.');
     }
     render();
   } catch { render(); }

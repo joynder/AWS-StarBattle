@@ -100,25 +100,22 @@ async function finishLogin() {
     toast('Password non corretta.');
     return;
   }
-  try {
-    if (!window.awsStore) throw new Error('storage-not-ready');
-    if (window.awsStore.login) {
-      const allowed = await window.awsStore.login();
-      if (allowed?.redirecting) { toast('Reindirizzamento a Google in corso…'); return; }
-      if (!allowed) { toast('Questo account Google non è autorizzato.'); return; }
-    }
-    tournamentAdmin = true;
-    $('#adminPassword').value = '';
-    $('#loginBackdrop').classList.remove('open');
-    render();
-    toast('Area riservata attivata.');
-  } catch (error) {
-    toast(window.awsStore?.loginErrorMessage?.(error) || 'Accesso non completato. Riprova.');
-  }
+  tournamentAdmin = true;
+  sessionStorage.setItem('awsStarBattleAdmin', 'true');
+  $('#adminPassword').value = '';
+  $('#loginBackdrop').classList.remove('open');
+  render();
+  toast('Area riservata attivata.');
 }
 
 $('#adminToggle').addEventListener('click', () => {
-  if (tournamentAdmin) { tournamentAdmin = false; render(); toast('Modalità amministratore disattivata.'); return; }
+  if (tournamentAdmin) {
+    tournamentAdmin = false;
+    sessionStorage.removeItem('awsStarBattleAdmin');
+    render();
+    toast('Modalità amministratore disattivata.');
+    return;
+  }
   $('#loginBackdrop').classList.add('open');
   setTimeout(() => $('#adminPassword').focus(), 50);
 });
@@ -155,9 +152,9 @@ $('#startTournament').addEventListener('click', generateRoundRobin);
 window.addEventListener('aws-store-ready', async () => {
   try {
     tournamentData = await window.awsStore.load() || { teams: [], tournaments: [] };
-    const redirectLogin = window.awsStore.consumeRedirectLogin?.();
-    if (redirectLogin === true) { tournamentAdmin = true; toast('Area riservata attivata.'); }
-    else if (redirectLogin === false) toast('Questo account Google non è autorizzato.');
+    if (sessionStorage.getItem('awsStarBattleAdmin') === 'true') {
+      tournamentAdmin = true;
+    }
   } catch { toast('Impossibile caricare i dati del torneo.'); }
   render();
 });

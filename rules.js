@@ -77,32 +77,18 @@ async function finishLogin() {
     toast('Password non corretta.');
     return;
   }
-  try {
-    if (!window.awsStore) throw new Error('storage-not-ready');
-    if (window.awsStore.login) {
-      const allowed = await window.awsStore.login();
-      if (allowed?.redirecting) {
-        toast('Reindirizzamento a Google in corso…');
-        return;
-      }
-      if (!allowed) {
-        toast('Questo account Google non è autorizzato.');
-        return;
-      }
-    }
-    rulesAdmin = true;
-    $('#adminPassword').value = '';
-    $('#loginBackdrop').classList.remove('open');
-    render();
-    toast('Benvenuto nell’area riservata.');
-  } catch (error) {
-    toast(window.awsStore?.loginErrorMessage?.(error) || 'Accesso non completato. Riprova.');
-  }
+  rulesAdmin = true;
+  sessionStorage.setItem('awsStarBattleAdmin', 'true');
+  $('#adminPassword').value = '';
+  $('#loginBackdrop').classList.remove('open');
+  render();
+  toast('Benvenuto nell’area riservata.');
 }
 
 $('#adminToggle').addEventListener('click', () => {
   if (rulesAdmin) {
     rulesAdmin = false;
+    sessionStorage.removeItem('awsStarBattleAdmin');
     render();
     toast('Modalità amministratore disattivata.');
     return;
@@ -138,14 +124,8 @@ $('#rulesForm').addEventListener('submit', async (event) => {
 window.addEventListener('aws-store-ready', async () => {
   try {
     rulesData = await window.awsStore.load() || {};
-    const redirectLogin = window.awsStore.consumeRedirectLogin?.();
-    if (redirectLogin === true) {
+    if (sessionStorage.getItem('awsStarBattleAdmin') === 'true') {
       rulesAdmin = true;
-      toast('Benvenuto nell’area riservata.');
-    } else if (redirectLogin === false) {
-      toast('Questo account Google non è autorizzato.');
-    } else if (redirectLogin?.error) {
-      toast(window.awsStore.loginErrorMessage?.({ code: redirectLogin.error }) || 'Accesso non completato. Riprova.');
     }
   } catch {
     rulesData = {};
