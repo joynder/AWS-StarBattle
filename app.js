@@ -1,9 +1,11 @@
-const defaultSponsors = [
-  { id: 'sponsor-main', name: 'Logo sponsor', image: 'sponsor-logo-bianco.png', link: '' },
-  { id: 'sponsor-skyrea', name: 'Skyrea Card Game', image: 'sponsor-skyrea.png', link: '' },
-  { id: 'sponsor-bloodbrothers', name: 'Blood Brothers', image: 'sponsor-bloodbrothers.png', link: '' },
-  { id: 'sponsor-bakuten', name: 'Bakuten Box', image: 'sponsor-bakuten-box.png', link: '' }
-];
+const defaultSponsors = [];
+const legacySponsorImages = new Set([
+  'sponsor-logo-bianco.png',
+  'sponsor-skyrea.png',
+  'sponsor-bloodbrothers.png',
+  'sponsor-bakuten-box.png',
+  'sponsor-res.png'
+]);
 
 const defaults = {
   teams: [],
@@ -64,7 +66,7 @@ function removeDemoContent(saved) {
     teams: (Array.isArray(saved?.teams) ? saved.teams : []).filter((team) => !demoTeamNames.includes(team.name)),
     tournaments: (Array.isArray(saved?.tournaments) ? saved.tournaments : []).filter((tournament) => !demoTournamentTitles.includes(tournament.title)),
     rules: typeof saved?.rules === 'string' ? saved.rules : '',
-    sponsors: Array.isArray(saved?.sponsors) ? saved.sponsors : defaultSponsors
+    sponsors: Array.isArray(saved?.sponsors) ? saved.sponsors.filter((sponsor) => !legacySponsorImages.has(sponsor.image)) : defaultSponsors
   };
 }
 
@@ -175,30 +177,22 @@ async function finishLogin() {
     toast('Password non corretta.');
     return;
   }
-  try {
-    if (window.awsStore?.login) {
-      const allowed = await window.awsStore.login();
-      if (allowed?.redirecting) {
-        toast('Reindirizzamento a Google in corso…');
-        return;
-      }
-      if (!allowed) {
-        toast('Questo account Google non è autorizzato.');
-        return;
-      }
-    }
-    admin = true;
-    $('#adminPassword').value = '';
-    $('#loginBackdrop').classList.remove('open');
-    render();
-    toast('Benvenuto nell’area riservata.');
-  } catch (error) {
-    toast(window.awsStore?.loginErrorMessage?.(error) || 'Accesso non completato. Riprova.');
-  }
+  admin = true;
+  sessionStorage.setItem('awsStarBattleAdmin', 'true');
+  $('#adminPassword').value = '';
+  $('#loginBackdrop').classList.remove('open');
+  render();
+  toast('Benvenuto nell’area riservata.');
 }
 
 $('#adminToggle').addEventListener('click', () => {
-  if (admin) { admin = false; render(); toast('Modalità amministratore disattivata.'); return; }
+  if (admin) { 
+    admin = false; 
+    sessionStorage.removeItem('awsStarBattleAdmin');
+    render(); 
+    toast('Modalità amministratore disattivata.'); 
+    return; 
+  }
   $('#loginBackdrop').classList.add('open');
   setTimeout(() => $('#adminPassword').focus(), 50);
 });
@@ -220,10 +214,16 @@ $('#editorForm').addEventListener('submit', (event) => {
   toast(edit.item ? 'Modifiche salvate.' : edit.type === 'team' ? 'Squadra aggiunta!' : 'Torneo pubblicato!');
 });
 
-$('#manageSponsors').addEventListener('click', () => {
+function openSponsorManager() {
+  if (!admin) {
+    toast('Accedi all’area riservata per gestire gli sponsor.');
+    return;
+  }
   renderSponsorManager();
   $('#sponsorsBackdrop').classList.add('open');
-});
+}
+window.openSponsorManager = openSponsorManager;
+$('#manageSponsors').addEventListener('click', openSponsorManager);
 $('#addSponsor').addEventListener('click', () => openSponsorEditor());
 $('#closeSponsors').addEventListener('click', () => $('#sponsorsBackdrop').classList.remove('open'));
 $('#sponsorsBackdrop').addEventListener('click', (event) => { if (event.target.id === 'sponsorsBackdrop') $('#sponsorsBackdrop').classList.remove('open'); });
@@ -242,14 +242,8 @@ window.addEventListener('aws-store-ready', async () => {
   try {
     const saved = await window.awsStore.load();
     data = removeDemoContent(saved);
-    const redirectLogin = window.awsStore.consumeRedirectLogin?.();
-    if (redirectLogin === true) {
+    if (sessionStorage.getItem('awsStarBattleAdmin') === 'true') {
       admin = true;
-      toast('Benvenuto nell’area riservata.');
-    } else if (redirectLogin === false) {
-      toast('Questo account Google non è autorizzato.');
-    } else if (redirectLogin?.error) {
-      toast(window.awsStore.loginErrorMessage?.({ code: redirectLogin.error }) || 'Accesso non completato. Riprova.');
     }
     render();
   } catch { render(); }
