@@ -80,47 +80,11 @@ async function persist() {
 }
 
 function render() {
-  const currentUser = window.awsAuth?.currentUser;
-  const isAdmin = currentUser && currentUser.badges.includes('admin');
-  const isClubLeader = currentUser && currentUser.badges.includes('club_leader');
-
-  // Toggle admin class on body for CSS styling visibility
-  document.body.classList.toggle('admin', isAdmin);
-
-  // Visibilità pulsanti creazione
-  const newTourneyBtn = $('[data-modal="tournament"]');
-  if (newTourneyBtn) {
-    newTourneyBtn.style.display = (isAdmin || isClubLeader) ? 'inline-flex' : 'none';
-  }
-  const newTeamBtn = $('[data-modal="team"]');
-  if (newTeamBtn) {
-    newTeamBtn.style.display = isAdmin ? 'inline-flex' : 'none';
-  }
-
   data.teams.sort((a, b) => b.stars - a.stars);
   $('#rankingBody').innerHTML = data.teams.length ? data.teams.map((team, index) => `
     <tr>
       <td class="rank">${index + 1}</td>
-      <td>
-        <div class="team-cell">
-          <img class="team-logo" src="${esc(team.logo)}" alt="Logo ${esc(team.name)}" onerror="this.src='https://placehold.co/90x90/41156d/fff?text=★'">
-          <div>
-            <span style="font-weight: 700; font-size: 16px;">${esc(team.name)}</span>
-            <div class="team-members-row">
-              ${(team.members || []).map(uid => {
-                const member = (team.membersDetails || []).find(m => m.uid === uid) || { nickname: 'Blader in attesa', photoURL: '' };
-                const avatar = member.photoURL || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + uid;
-                return `
-                  <span class="team-member-badge" title="${esc(member.nickname)}">
-                    <img src="${esc(avatar)}" alt="">
-                    <span>${esc(member.nickname)}</span>
-                  </span>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        </div>
-      </td>
+      <td><div class="team-cell"><img class="team-logo" src="${esc(team.logo)}" alt="Logo ${esc(team.name)}" onerror="this.src='https://placehold.co/90x90/41156d/fff?text=★'"><span>${esc(team.name)}</span></div></td>
       <td class="stars">${team.stars}</td>
       <td class="admin-only"><div class="table-actions"><button class="action" onclick="openEdit('team',${team.id})">Modifica</button><button class="action delete" onclick="removeItem('team',${team.id})">Elimina</button></div></td>
     </tr>`).join('') : '';
@@ -128,16 +92,9 @@ function render() {
   const tournaments = [...data.tournaments].sort((first, second) => tournamentTimestamp(first) - tournamentTimestamp(second));
   $('#tournamentGrid').innerHTML = tournaments.length ? tournaments.map((tournament) => {
     const past = isPastTournament(tournament);
-    const canManageTournament = isAdmin || (isClubLeader && String(tournament.creatorId) === String(currentUser?.uid));
-    
     return `
     <article class="tournament-card${past ? ' is-past' : ''}" role="link" tabindex="0" onclick='openTournament(${JSON.stringify(tournament.id)})' onkeydown='if(event.key === "Enter" || event.key === " "){event.preventDefault();openTournament(${JSON.stringify(tournament.id)})}'>
-      ${canManageTournament ? `
-      <div class="card-actions" style="display: flex;" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()">
-        <button class="action" onclick="openEdit('tournament',${tournament.id})">Modifica</button>
-        <button class="action delete" onclick="removeItem('tournament',${tournament.id})">Elimina</button>
-      </div>
-      ` : ''}
+      <div class="card-actions" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()"><button class="action" onclick="openEdit('tournament',${tournament.id})">Modifica</button><button class="action delete" onclick="removeItem('tournament',${tournament.id})">Elimina</button></div>
       ${tournament.image ? `<div class="tournament-image"><img src="${esc(tournament.image)}" alt="Immagine del torneo ${esc(tournament.title)}" loading="lazy" onerror="this.parentElement.remove()"></div>` : ''}
       <p class="eyebrow">TORNEO APRILIA WESTSIDE</p><h3>${esc(tournament.title)}</h3>
       <div class="meta">
@@ -151,6 +108,7 @@ function render() {
     </article>`;
   }).join('') : '';
   renderSponsors();
+  document.body.classList.toggle('admin', admin);
 }
 
 function sponsorLink(link) {
@@ -214,97 +172,81 @@ window.removeItem = (type, id) => {
   persist(); render(); toast('Elemento eliminato.');
 };
 
-document.querySelectorAll('[data-modal]').forEach((button) => button.addEventListener('click', () => openModal(button.dataset.modal)));
-const closeModalBtn = $('#closeModal');
-if (closeModalBtn) closeModalBtn.addEventListener('click', () => $('#modalBackdrop').classList.remove('open'));
-const modalBackdropEl = $('#modalBackdrop');
-if (modalBackdropEl) modalBackdropEl.addEventListener('click', (event) => { if (event.target.id === 'modalBackdrop') $('#modalBackdrop').classList.remove('open'); });
+async function finishLogin() {
+  if ($('#adminPassword').value !== 'starbattle') {
+    toast('Password non corretta.');
+    return;
+  }
+  admin = true;
+  sessionStorage.setItem('awsStarBattleAdmin', 'true');
+  $('#adminPassword').value = '';
+  $('#loginBackdrop').classList.remove('open');
+  render();
+  toast('Benvenuto nell’area riservata.');
+}
 
+$('#adminToggle').addEventListener('click', () => {
+  if (admin) { 
+    admin = false; 
+    sessionStorage.removeItem('awsStarBattleAdmin');
+    render(); 
+    toast('Modalità amministratore disattivata.'); 
+    return; 
+  }
+  $('#loginBackdrop').classList.add('open');
+  setTimeout(() => $('#adminPassword').focus(), 50);
+});
+$('#closeLogin').addEventListener('click', () => $('#loginBackdrop').classList.remove('open'));
+$('#loginBackdrop').addEventListener('click', (event) => { if (event.target.id === 'loginBackdrop') $('#loginBackdrop').classList.remove('open'); });
+$('#loginSubmit').addEventListener('click', finishLogin);
+$('#loginForm').addEventListener('submit', (event) => { event.preventDefault(); finishLogin(); });
+document.querySelectorAll('[data-modal]').forEach((button) => button.addEventListener('click', () => openModal(button.dataset.modal)));
+$('#closeModal').addEventListener('click', () => $('#modalBackdrop').classList.remove('open'));
+$('#modalBackdrop').addEventListener('click', (event) => { if (event.target.id === 'modalBackdrop') $('#modalBackdrop').classList.remove('open'); });
 $('#editorForm').addEventListener('submit', (event) => {
   event.preventDefault();
   const item = Object.fromEntries(new FormData(event.target));
   if (edit.type === 'team') item.stars = Number(item.stars);
   const key = edit.type === 'team' ? 'teams' : 'tournaments';
   if (edit.item) Object.assign(edit.item, item);
-  else { 
-    item.id = Date.now(); 
-    if (edit.type === 'tournament' && window.awsAuth?.currentUser) {
-      item.creatorId = window.awsAuth.currentUser.uid;
-    }
-    data[key].push(item); 
-  }
+  else { item.id = Date.now(); data[key].push(item); }
   persist(); render(); $('#modalBackdrop').classList.remove('open');
   toast(edit.item ? 'Modifiche salvate.' : edit.type === 'team' ? 'Squadra aggiunta!' : 'Torneo pubblicato!');
 });
 
 function openSponsorManager() {
-  const currentUser = window.awsAuth?.currentUser;
-  const isAdmin = currentUser && currentUser.badges.includes('admin');
-  if (!isAdmin) {
-    toast('Accesso consentito solo agli amministratori.');
+  if (!admin) {
+    toast('Accedi all’area riservata per gestire gli sponsor.');
     return;
   }
   renderSponsorManager();
   $('#sponsorsBackdrop').classList.add('open');
 }
 window.openSponsorManager = openSponsorManager;
-const manageSponsorsBtn = $('#manageSponsors');
-if (manageSponsorsBtn) manageSponsorsBtn.addEventListener('click', openSponsorManager);
-const addSponsorBtn = $('#addSponsor');
-if (addSponsorBtn) addSponsorBtn.addEventListener('click', () => openSponsorEditor());
-const closeSponsorsBtn = $('#closeSponsors');
-if (closeSponsorsBtn) closeSponsorsBtn.addEventListener('click', () => $('#sponsorsBackdrop').classList.remove('open'));
-const sponsorsBackdropEl = $('#sponsorsBackdrop');
-if (sponsorsBackdropEl) sponsorsBackdropEl.addEventListener('click', (event) => { if (event.target.id === 'sponsorsBackdrop') $('#sponsorsBackdrop').classList.remove('open'); });
-const closeSponsorEditorBtn = $('#closeSponsorEditor');
-if (closeSponsorEditorBtn) closeSponsorEditorBtn.addEventListener('click', () => $('#sponsorEditorBackdrop').classList.remove('open'));
-const sponsorEditorBackdropEl = $('#sponsorEditorBackdrop');
-if (sponsorEditorBackdropEl) sponsorEditorBackdropEl.addEventListener('click', (event) => { if (event.target.id === 'sponsorEditorBackdrop') $('#sponsorEditorBackdrop').classList.remove('open'); });
-
-const sponsorFormEl = $('#sponsorForm');
-if (sponsorFormEl) {
-  sponsorFormEl.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const sponsor = Object.fromEntries(new FormData(event.currentTarget));
-    if (sponsorEdit) Object.assign(sponsorEdit, sponsor);
-    else data.sponsors.push({ ...sponsor, id: `sponsor-${Date.now()}` });
-    persist(); render(); renderSponsorManager(); $('#sponsorEditorBackdrop').classList.remove('open');
-    toast(sponsorEdit ? 'Sponsor modificato.' : 'Sponsor aggiunto.');
-  });
-}
+$('#manageSponsors').addEventListener('click', openSponsorManager);
+$('#addSponsor').addEventListener('click', () => openSponsorEditor());
+$('#closeSponsors').addEventListener('click', () => $('#sponsorsBackdrop').classList.remove('open'));
+$('#sponsorsBackdrop').addEventListener('click', (event) => { if (event.target.id === 'sponsorsBackdrop') $('#sponsorsBackdrop').classList.remove('open'); });
+$('#closeSponsorEditor').addEventListener('click', () => $('#sponsorEditorBackdrop').classList.remove('open'));
+$('#sponsorEditorBackdrop').addEventListener('click', (event) => { if (event.target.id === 'sponsorEditorBackdrop') $('#sponsorEditorBackdrop').classList.remove('open'); });
+$('#sponsorForm').addEventListener('submit', (event) => {
+  event.preventDefault();
+  const sponsor = Object.fromEntries(new FormData(event.currentTarget));
+  if (sponsorEdit) Object.assign(sponsorEdit, sponsor);
+  else data.sponsors.push({ ...sponsor, id: `sponsor-${Date.now()}` });
+  persist(); render(); renderSponsorManager(); $('#sponsorEditorBackdrop').classList.remove('open');
+  toast(sponsorEdit ? 'Sponsor modificato.' : 'Sponsor aggiunto.');
+});
 
 window.addEventListener('aws-store-ready', async () => {
   try {
     const saved = await window.awsStore.load();
     data = removeDemoContent(saved);
-    render();
-
-    // Listen to Firebase Auth
-    if (window.awsAuth) {
-      window.awsAuth.onAuthChange((user) => {
-        const profileLink = $('#profileLink');
-        const loginLink = $('#loginLink');
-        if (user) {
-          if (profileLink) profileLink.classList.remove('hidden');
-          if (loginLink) loginLink.classList.add('hidden');
-          const avatarEl = $('#navAvatar');
-          const nickEl = $('#navNickname');
-          if (avatarEl) avatarEl.src = user.photoURL;
-          if (nickEl) nickEl.textContent = user.nickname || 'Profilo';
-          
-          admin = user.badges && user.badges.includes('admin');
-        } else {
-          if (profileLink) profileLink.classList.add('hidden');
-          if (loginLink) loginLink.classList.remove('hidden');
-          admin = false;
-        }
-        render();
-      });
+    if (sessionStorage.getItem('awsStarBattleAdmin') === 'true') {
+      admin = true;
     }
-  } catch (e) {
-    console.error(e);
     render();
-  }
+  } catch { render(); }
 });
 
 render();

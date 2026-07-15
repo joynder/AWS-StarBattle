@@ -38,38 +38,12 @@ function participantIds(tournament) {
 
 function render() {
   const tournament = currentTournament();
-  const currentUser = window.awsAuth?.currentUser;
-  
+  document.body.classList.toggle('admin', tournamentAdmin);
   if (!tournament) {
     $('#eventHero').innerHTML = '<p class="eyebrow">TORNEO NON TROVATO</p><h1>Questo torneo non è disponibile.</h1>';
     $('#registrationCopy').textContent = 'Torna alla pagina dei tornei e selezionane uno valido.';
     return;
   }
-  
-  const isAdmin = currentUser && currentUser.badges.includes('admin');
-  const isClubLeader = currentUser && currentUser.badges.includes('club_leader');
-  tournamentAdmin = isAdmin || (isClubLeader && String(tournament.creatorId) === String(currentUser?.uid));
-  
-  document.body.classList.toggle('admin', tournamentAdmin);
-
-  // Gestione iscrizione autonoma (per caposquadra)
-  const selfEnrollPanel = $('#selfEnrollPanel');
-  if (selfEnrollPanel) {
-    if (currentUser && currentUser.teamId && currentUser.role === 'leader' && !tournament.startedAt) {
-      const myTeamId = String(currentUser.teamId);
-      const isAlreadyRegistered = (tournament.teamIds || []).map(String).includes(myTeamId);
-      if (!isAlreadyRegistered) {
-        selfEnrollPanel.classList.remove('hidden');
-        const myTeam = teamById(currentUser.teamId);
-        $('#selfEnrollTeamName').textContent = myTeam ? myTeam.name : 'Tua Squadra';
-      } else {
-        selfEnrollPanel.classList.add('hidden');
-      }
-    } else {
-      selfEnrollPanel.classList.add('hidden');
-    }
-  }
-
   const ids = participantIds(tournament);
   $('#eventHero').innerHTML = `<p class="eyebrow">TORNEO APRILIA WESTSIDE</p><h1>${esc(tournament.title)}</h1><div class="event-info"><span><small>DATA · ORA</small>${esc(formatDate(tournament.date))} · ${esc(tournament.time)}</span><span><small>LUOGO</small>${esc(tournament.place)}</span><span><small>FORMATO</small>${esc(tournament.format)}</span></div>`;
   $('#registrationCopy').textContent = ids.length ? `${ids.length} ${ids.length === 1 ? 'squadra iscritta' : 'squadre iscritte'}.` : 'Nessuna squadra iscritta.';
@@ -121,45 +95,46 @@ async function saveTournament(update) {
   render();
 }
 
-const registrationFormEl = $('#registrationForm');
-if (registrationFormEl) {
-  registrationFormEl.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const teamIds = [...new FormData(event.currentTarget).getAll('team')];
-    try {
-      await saveTournament((tournament) => {
-        tournament.teamIds = teamIds;
-        delete tournament.rounds;
-        delete tournament.startedAt;
-      });
-      toast('Iscrizioni salvate.');
-    } catch { toast('Impossibile salvare le iscrizioni.'); }
-  });
+async function finishLogin() {
+  if ($('#adminPassword').value !== 'starbattle') {
+    toast('Password non corretta.');
+    return;
+  }
+  tournamentAdmin = true;
+  sessionStorage.setItem('awsStarBattleAdmin', 'true');
+  $('#adminPassword').value = '';
+  $('#loginBackdrop').classList.remove('open');
+  render();
+  toast('Area riservata attivata.');
 }
 
-const selfEnrollBtn = $('#selfEnrollBtn');
-if (selfEnrollBtn) {
-  selfEnrollBtn.addEventListener('click', async () => {
-    const currentUser = window.awsAuth?.currentUser;
-    if (!currentUser || !currentUser.teamId) return;
-    try {
-      await saveTournament((tournament) => {
-        tournament.teamIds = tournament.teamIds || [];
-        const myTeamId = String(currentUser.teamId);
-        if (!tournament.teamIds.map(String).includes(myTeamId)) {
-          tournament.teamIds.push(myTeamId);
-        }
-        delete tournament.rounds;
-        delete tournament.startedAt;
-      });
-      toast('Squadra iscritta con successo!');
-    } catch (e) {
-      console.error(e);
-      toast('Impossibile iscrivere la squadra.');
-    }
-  });
-}
-
+$('#adminToggle').addEventListener('click', () => {
+  if (tournamentAdmin) {
+    tournamentAdmin = false;
+    sessionStorage.removeItem('awsStarBattleAdmin');
+    render();
+    toast('Modalità amministratore disattivata.');
+    return;
+  }
+  $('#loginBackdrop').classList.add('open');
+  setTimeout(() => $('#adminPassword').focus(), 50);
+});
+$('#closeLogin').addEventListener('click', () => $('#loginBackdrop').classList.remove('open'));
+$('#loginBackdrop').addEventListener('click', (event) => { if (event.target.id === 'loginBackdrop') $('#loginBackdrop').classList.remove('open'); });
+$('#loginSubmit').addEventListener('click', finishLogin);
+$('#loginForm').addEventListener('submit', (event) => { event.preventDefault(); finishLogin(); });
+$('#registrationForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const teamIds = [...new FormData(event.currentTarget).getAll('team')];
+  try {
+    await saveTournament((tournament) => {
+      tournament.teamIds = teamIds;
+      delete tournament.rounds;
+      delete tournament.startedAt;
+    });
+    toast('Iscrizioni salvate.');
+  } catch { toast('Impossibile salvare le iscrizioni.'); }
+});
 async function generateRoundRobin() {
   try {
     await saveTournament((tournament) => {
@@ -173,35 +148,14 @@ async function generateRoundRobin() {
     toast(error.message === 'not-enough-teams' ? 'Iscrivi almeno due squadre prima di avviare il torneo.' : 'Impossibile generare gli abbinamenti.');
   }
 }
-
-const startTournamentBtn = $('#startTournament');
-if (startTournamentBtn) startTournamentBtn.addEventListener('click', generateRoundRobin);
-
+$('#startTournament').addEventListener('click', generateRoundRobin);
 window.addEventListener('aws-store-ready', async () => {
   try {
     tournamentData = await window.awsStore.load() || { teams: [], tournaments: [] };
-    
-    // Listen to Firebase Auth
-    if (window.awsAuth) {
-      window.awsAuth.onAuthChange((user) => {
-        const profileLink = $('#profileLink');
-        const loginLink = $('#loginLink');
-        if (user) {
-          if (profileLink) profileLink.classList.remove('hidden');
-          if (loginLink) loginLink.classList.add('hidden');
-          const avatarEl = $('#navAvatar');
-          const nickEl = $('#navNickname');
-          if (avatarEl) avatarEl.src = user.photoURL;
-          if (nickEl) nickEl.textContent = user.nickname || 'Profilo';
-        } else {
-          if (profileLink) profileLink.classList.add('hidden');
-          if (loginLink) loginLink.classList.remove('hidden');
-        }
-        render();
-      });
+    if (sessionStorage.getItem('awsStarBattleAdmin') === 'true') {
+      tournamentAdmin = true;
     }
   } catch { toast('Impossibile caricare i dati del torneo.'); }
   render();
 });
-
 render();
